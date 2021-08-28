@@ -1,0 +1,556 @@
+
+# Nombre de feuilles
+
+```{r message = FALSE, warning = FALSE, echo = FALSE}
+library(tidyverse)
+library(ggpubr)
+library(rstatix)
+```
+
+## Préparation des données
+
+Jeu de données `veg` qui contient différentes mesures dont le nombre de feuilles de plants de tomate, compté 4 fois en cours de culture, lors d'un essai de fertilisation de fin novembre 2020 à mars 2021. Dispositif expérimental en bloc de Fisher avec 6 traitements en 5 répétitions tels que décrits dans le chapitre précédent.
+
+Un nombre moyen de feuilles est calculé pour les 4 plants centraux mesurés le même jour de la semaine en 4 séances : 
+
+1. `feuil1` : 55 j AS, 21 j AR, semaine 3 AR
+1. `feuil2` : 69 j AS, 35 j AR, semaine 5 AR 
+1. `feuil3` : 76 j AS, 42 j AR, semaine 6 AR 
+1. `feuil4` : 83 j AS, 49 j AR, semaine 7 AR.
+
+La question est de savoir si les différents types d'engrais induisent des qantités de feuilles significativement différentes. 
+
+> **Nous souhaitons évaluer si ces différents engrais apportent une plus value comparée au témoin; surtout si les effets diffèrent d'un type d'engrais à l'autre sur les paramètres végétatifs et/ou de rendement.**
+
+Charger le dataframe et extraire seulement les variables d'intérêt pour l'analyse du nombre de feuilles.
+
+```{r}
+df <- read_csv("data/veg.csv")
+```
+
+```{r}
+df <- df %>% 
+  mutate(id = 1:nrow(.), .before = 1) %>%
+  select(id, bloc, traitement, engrais, feuil1, feuil2, feuil3, feuil4) %>% 
+  convert_as_factor(traitement, engrais)
+
+df$engrais <- factor(df$engrais, 
+                     levels = c("Temoin", "Fumier porcs", "Fumier poulets", 
+                                "Engrais mineral", "50% FPorcs + 50% Eng. Min.", 
+                                "50% FPoulets + 50% Eng. Min."))
+
+write_csv(df, "tab/feuilles.csv")
+df_original <- df # une copie
+
+set.seed(123)
+df %>% sample_n_by(bloc, size = 1)
+```
+
+
+## Feuilles 1
+
+### Visualisation, boxplots
+
+```{r}
+bxp <- ggplot(df, aes(x = engrais, y = feuil1)) +
+  geom_boxplot() +
+  theme_classic() +
+  xlab("Engrais") + ylab("Nombre de feuilles") +
+  theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
+bxp
+```
+
+### Identification des outliers extrêmes
+
+```{r}
+df_out <- df %>%
+  group_by(engrais) %>%
+  identify_outliers(feuil1) %>% 
+  select(engrais, bloc, feuil1, is.outlier, is.extreme)
+df_out
+```
+
+Il n'y a pas d'observation aberrante extrême.
+
+```{r}
+#df <- df %>% filter(! id %in% df_out$id)
+```
+
+
+### Le modèle ANOVA
+
+```{r}
+lm1 <- lm(feuil1 ~ engrais, data = df)
+Anova(lm1)
+```
+
+À la semaine 3 après le repiquage, il ne serait pas encore possible d'établir des différences significatives entre les effets des traitements sur le nombre de feuilles des plants. Mais vérifions les conditions de validité de l'ANOVA.
+
+### Indépendance des résidus
+
+```{r}
+plot(lm1, 1)
+```
+
+### Normalité des résidus
+
+```{r}
+plot(lm1, 2)
+```
+
+```{r}
+shapiro_test(residuals(lm1))
+```
+
+### Homogénéité des variances
+
+```{r}
+plot(lm1, 3)
+```
+
+```{r}
+levene_test(residuals(lm1) ~ engrais, data = df)
+```
+
+On retient que la conclusion de l'ANOVA peut être considérée valide : => Pas de différence d'effet sur le nombre de feuilles des plants à cette date. 
+
+### Comparaisons par paires
+
+Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais).
+
+```{r}
+cm <- multcomp::glht(lm1, linfct = multcomp::mcp(engrais = "Tukey"))
+#summary(cm)
+```
+
+### Graph des comparaisons
+
+```{r}
+#par(mar = c(0, 22, 0, 0))
+#plot(cm)
+```
+
+### Lettres pour différencier
+
+```{r}
+cld <- multcomp::cld(cm)
+cld
+```
+
+### Les lettres dans un dataframe pour ggplot
+
+```{r}
+Le <- cld$mcletters$Letters
+L <- data.frame(engrais = levels(df$engrais),
+                lettres = Le)
+L
+```
+
+### Associer les moyennes et les écart-types pour le rapport
+
+```{r}
+feuil1_moy <- df %>% 
+  group_by(engrais) %>% 
+  get_summary_stats(feuil1, type = "mean_sd") %>%
+  select(-variable) %>% 
+  mutate(lettres = L$lettres)
+write_csv(feuil1_moy, "tab/feuille1_moyennes.csv")
+feuil1_moy
+```
+
+### Graphe avec les comparaisons
+
+```{r}
+ggplot(feuil1_moy, aes(x = engrais, y = mean)) + 
+  geom_bar(stat = "identity", color = "blue", fill = "grey", width = 0.6) +
+  ylim(0, 9) +
+  theme_bw() +
+  xlab("Engrais") + ylab("Nombre de feuilles") +
+  theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1)) +
+  geom_text(aes(label = lettres), vjust = -0.5, size = 4)
+```
+
+
+## Feuilles 2
+
+```{r}
+df <- df_original
+```
+
+### Visualisation, boxplots
+
+```{r}
+bxp <- ggplot(df, aes(x = engrais, y = feuil2)) +
+  geom_boxplot() +
+  theme_classic() +
+  xlab("Engrais") + ylab("Nombre de feuilles") +
+  theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
+bxp
+```
+
+### Identification des outliers extrêmes
+
+```{r}
+df_out <- df %>%
+  group_by(engrais) %>%
+  identify_outliers(feuil2) %>% 
+  select(engrais, bloc, feuil2, is.outlier, is.extreme)
+df_out
+```
+
+Il n'y a pas d'observation aberrante extrême.
+
+```{r}
+#df <- df %>% filter(! id %in% df_out$id)
+```
+
+
+### Le modèle ANOVA
+
+```{r}
+lm2 <- lm(feuil2 ~ engrais, data = df)
+Anova(lm2)
+```
+
+À la semaine 5 après le repiquage, au moins deux types d'engrais ont des effets très significativement différents sur le nombre de feuilles des plants. Mais vérifions les conditions de validité de l'ANOVA.
+
+### Indépendance des résidus
+
+```{r}
+plot(lm2, 1)
+```
+
+### Normalité des résidus
+
+```{r}
+plot(lm2, 2)
+```
+
+```{r}
+shapiro_test(residuals(lm2))
+```
+
+### Homogénéité des variances
+
+```{r}
+plot(lm2, 3)
+```
+
+```{r}
+levene_test(residuals(lm2) ~ engrais, data = df)
+```
+
+On retient que la conclusion de l'ANOVA peut être considérée valide. Trouvons les engrais dont les effets sont différents.
+
+### Comparaisons par paires
+
+Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais) pour identifier ceux dont les effets sont différents.
+
+```{r}
+cm <- multcomp::glht(lm2, linfct = multcomp::mcp(engrais = "Tukey"))
+summary(cm)
+```
+
+### Graph des comparaisons
+
+```{r}
+par(mar = c(0, 22, 0, 0))
+plot(cm)
+```
+
+### Lettres pour différencier
+
+```{r}
+cld <- multcomp::cld(cm)
+cld
+```
+
+### Les lettres dans un dataframe pour ggplot
+
+```{r}
+Le <- cld$mcletters$Letters
+L <- data.frame(engrais = levels(df$engrais),
+                lettres = Le)
+L
+```
+
+### Associer les moyennes et les écart-types pour le rapport
+
+```{r}
+feuil2_moy <- df %>% 
+  group_by(engrais) %>% 
+  get_summary_stats(feuil2, type = "mean_sd") %>%
+  select(-variable) %>% 
+  mutate(lettres = L$lettres)
+write_csv(feuil2_moy, "tab/feuille2_moyennes.csv")
+feuil2_moy
+```
+
+### Graphe avec les comparaisons
+
+```{r}
+ggplot(feuil2_moy, aes(x = engrais, y = mean)) + 
+  geom_bar(stat = "identity", color = "blue", fill = "grey", width = 0.6) +
+  ylim(0, 15) +
+  theme_bw() +
+  xlab("Engrais") + ylab("Nombre de feuilles") +
+  theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1)) +
+  geom_text(aes(label = lettres), vjust = -0.5, size = 4)
+```
+
+
+## Feuilles 3
+
+```{r}
+df <- df_original
+```
+
+### Visualisation, boxplots
+
+```{r}
+bxp <- ggplot(df, aes(x = engrais, y = feuil3)) +
+  geom_boxplot() +
+  theme_classic() +
+  xlab("Engrais") + ylab("Nombre de feuilles") +
+  theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
+bxp
+```
+
+### Identification des outliers extrêmes
+
+```{r}
+df_out <- df %>%
+  group_by(engrais) %>%
+  identify_outliers(feuil3) %>% 
+  select(engrais, bloc, feuil3, is.outlier, is.extreme)
+df_out
+```
+
+Il n'y a pas d'observation aberrante extrême.
+
+```{r}
+#df <- df %>% filter(! id %in% df_out$id)
+```
+
+
+### Le modèle ANOVA
+
+```{r}
+lm3 <- lm(feuil3 ~ engrais, data = df)
+Anova(lm3)
+```
+
+À la semaine 6 après le repiquage, il n'y aurait pas d'effets significativement différents sur le nombre de feuilles des plants. Mais vérifions les conditions de validité de l'ANOVA.
+
+### Indépendance des résidus
+
+```{r}
+plot(lm3, 1)
+```
+
+### Normalité des résidus
+
+```{r}
+plot(lm3, 2)
+```
+
+```{r}
+shapiro_test(residuals(lm3))
+```
+
+### Homogénéité des variances
+
+```{r}
+plot(lm3, 3)
+```
+
+```{r}
+levene_test(residuals(lm3) ~ engrais, data = df)
+```
+
+On retient que la conclusion de l'ANOVA peut être considérée valide. Affichons quand même les comparaisons par paires.
+
+### Comparaisons par paires
+
+Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais).
+
+```{r}
+cm <- multcomp::glht(lm3, linfct = multcomp::mcp(engrais = "Tukey"))
+#summary(cm)
+```
+
+### Graph des comparaisons
+
+```{r}
+#par(mar = c(0, 22, 0, 0))
+#plot(cm)
+```
+
+### Lettres pour différencier
+
+```{r}
+cld <- multcomp::cld(cm)
+cld
+```
+
+### Les lettres dans un dataframe pour ggplot
+
+```{r}
+Le <- cld$mcletters$Letters
+L <- data.frame(engrais = levels(df$engrais),
+                lettres = Le)
+L
+```
+
+### Associer les moyennes et les écart-types pour le rapport
+
+```{r}
+feuil3_moy <- df %>% 
+  group_by(engrais) %>% 
+  get_summary_stats(feuil3, type = "mean_sd") %>%
+  select(-variable) %>% 
+  mutate(lettres = L$lettres)
+write_csv(feuil3_moy, "tab/feuille3_moyennes.csv")
+feuil3_moy
+```
+
+### Graphe avec les comparaisons
+
+```{r}
+ggplot(feuil3_moy, aes(x = engrais, y = mean)) + 
+  geom_bar(stat = "identity", color = "blue", fill = "grey", width = 0.6) +
+  ylim(0, 15) +
+  theme_bw() +
+  xlab("Engrais") + ylab("Nombre de feuilles") +
+  theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1)) +
+  geom_text(aes(label = lettres), vjust = -0.5, size = 4)
+```
+
+
+## Feuilles 4
+
+```{r}
+df <- df_original
+```
+
+### Visualisation, boxplots
+
+```{r}
+bxp <- ggplot(df, aes(x = engrais, y = feuil4)) +
+  geom_boxplot() +
+  theme_classic() +
+  xlab("Engrais") + ylab("Nombre de feuilles") +
+  theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
+bxp
+```
+
+### Identification des outliers extrêmes
+
+```{r}
+df_out <- df %>%
+  group_by(engrais) %>%
+  identify_outliers(feuil4) %>% 
+  select(engrais, bloc, feuil4, is.outlier, is.extreme)
+df_out
+```
+
+Il n'y a pas d'observation aberrante extrême.
+
+```{r}
+#df <- df %>% filter(! id %in% df_out$id)
+```
+
+
+### Le modèle ANOVA
+
+```{r}
+lm4 <- lm(feuil4 ~ engrais, data = df)
+Anova(lm4)
+```
+
+À la semaine 7 après le repiquage, il n'y aurait également pad d'effets significativement différents sur le nombre de feuilles des plants. Mais vérifions les conditions de validité de l'ANOVA.
+
+### Indépendance des résidus
+
+```{r}
+plot(lm4, 1)
+```
+
+### Normalité des résidus
+
+```{r}
+plot(lm4, 2)
+```
+
+```{r}
+shapiro_test(residuals(lm4))
+```
+
+### Homogénéité des variances
+
+```{r}
+plot(lm4, 3)
+```
+
+```{r}
+levene_test(residuals(lm4) ~ engrais, data = df)
+```
+
+On retient que la conclusion de l'ANOVA peut être considérée valide. Affichons quand même les comparaisons par paires.
+
+
+### Comparaisons par paires
+
+Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais) pour identifier ceux dont les effets sont différents.
+
+```{r}
+cm <- multcomp::glht(lm4, linfct = multcomp::mcp(engrais = "Tukey"))
+#summary(cm)
+```
+
+### Graph des comparaisons
+
+```{r}
+#par(mar = c(0, 22, 0, 0))
+#plot(cm)
+```
+
+### Lettres pour différencier
+
+```{r}
+cld <- multcomp::cld(cm)
+cld
+```
+
+### Les lettres dans un dataframe pour ggplot
+
+```{r}
+Le <- cld$mcletters$Letters
+L <- data.frame(engrais = levels(df$engrais),
+                lettres = Le)
+L
+```
+
+### Associer les moyennes et les écart-types pour le rapport
+
+```{r}
+feuil4_moy <- df %>% 
+  group_by(engrais) %>% 
+  get_summary_stats(feuil4, type = "mean_sd") %>%
+  select(-variable) %>% 
+  mutate(lettres = L$lettres)
+write_csv(feuil4_moy, "tab/feuille4_moyennes.csv")
+feuil4_moy
+```
+
+### Graphe avec les comparaisons
+
+```{r}
+ggplot(feuil4_moy, aes(x = engrais, y = mean)) + 
+  geom_bar(stat = "identity", color = "blue", fill = "grey", width = 0.6) +
+  ylim(0, 15) +
+  theme_bw() +
+  xlab("Engrais") + ylab("Nombre de feuilles") +
+  theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1)) +
+  geom_text(aes(label = lettres), vjust = -0.5, size = 4)
+```

@@ -1,0 +1,563 @@
+---
+title: "Essai de fertilisation de la tomate"
+author: "zco"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+
+# Diamètre des plants
+
+```{r message = FALSE, warning = FALSE, echo = FALSE}
+library(tidyverse)
+library(ggpubr)
+library(rstatix)
+```
+
+## Préparation des données
+
+Jeu de données `veg` qui contient différentes mesures dont les diamètres de plants de tomate, mesurés 4 fois en cours de culture, lors d'un essai de fertilisation de fin novembre 2020 à mars 2021. Dispositif expérimental en bloc de Fisher avec 6 traitements en 5 répétitions tels que décrits dans le chapitre précédent.
+
+Un diamètre moyen est calculé pour les 4 plants centraux mesurés le même jour de la semaine en 4 séances : 
+
+1. `diam1` : 55 j AS, 21 j AR, semaine 3 AR
+1. `diam2` : 69 j AS, 35 j AR, semaine 5 AR 
+1. `diam3` : 76 j AS, 42 j AR, semaine 6 AR 
+1. `diam4` : 83 j AS, 49 j AR, semaine 7 AR.
+
+La question est de savoir si les différents types d'engrais induisent des augmentations de diamètre de plant significativement différentes. 
+
+> **Nous souhaitons évaluer si ces différents engrais apportent une plus value comparée au témoin; surtout si les effets diffèrent d'un type d'engrais à l'autre sur les paramètres végétatifs et/ou de rendement.**
+
+Charger le dataframe et extraire seulement les variables d'intérêt pour l'analyse du diamètre des plants.
+
+```{r}
+df <- read_csv("data/veg.csv")
+```
+
+```{r}
+df <- df %>% 
+  mutate(id = 1:nrow(.), .before = 1) %>%
+  select(id, bloc, traitement, engrais, diam1, diam2, diam3, diam4) %>% 
+  convert_as_factor(traitement, engrais)
+
+df$engrais <- factor(df$engrais, 
+                     levels = c("Temoin", "Fumier porcs", "Fumier poulets", 
+                                "Engrais mineral", "50% FPorcs + 50% Eng. Min.", 
+                                "50% FPoulets + 50% Eng. Min."))
+
+write_csv(df, "tab/diametres.csv")
+df_original <- df # une copie
+
+set.seed(123)
+df %>% sample_n_by(bloc, size = 1)
+```
+
+## Diamètre 1
+
+### Visualisation, boxplots
+
+```{r}
+bxp <- ggplot(df, aes(x = engrais, y = diam1)) +
+  geom_boxplot() +
+  theme_classic() +
+  xlab("Engrais") + ylab("Diamètre des plants - mm") +
+  theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
+bxp
+```
+
+### Identification des outliers extrêmes
+
+```{r}
+df_out <- df %>%
+  group_by(engrais) %>%
+  identify_outliers(diam1) %>% 
+  select(engrais, bloc, diam1, is.outlier, is.extreme)
+df_out
+```
+
+Il n'y a pas d'observation aberrante extrême.
+
+```{r}
+#df <- df %>% filter(! id %in% df_out$id)
+```
+
+
+### Le modèle ANOVA
+
+```{r}
+lm1 <- lm(diam1 ~ engrais, data = df)
+Anova(lm1)
+```
+
+À la semaine 3 après le repiquage, il ne serait pas encore possible d'établir des différences significatives entre les effets des traitements sur les Diamètres des plants. Mais vérifions les conditions de validité de l'ANOVA.
+
+### Indépendance des résidus
+
+```{r}
+plot(lm1, 1)
+```
+
+### Normalité des résidus
+
+```{r}
+plot(lm1, 2)
+```
+
+```{r}
+shapiro_test(residuals(lm1))
+```
+
+### Homogénéité des variances
+
+```{r}
+plot(lm1, 3)
+```
+
+```{r}
+levene_test(residuals(lm1) ~ engrais, data = df)
+```
+
+On retient que la conclusion de l'ANOVA peut être considérée valide : => Pas de différence d'effet sur le diamètre des plants à hauteur du colet à cette date. 
+
+### Comparaisons par paires
+
+Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais).
+
+```{r}
+cm <- multcomp::glht(lm1, linfct = multcomp::mcp(engrais = "Tukey"))
+#summary(cm)
+```
+
+### Graph des comparaisons
+
+```{r}
+#par(mar = c(0, 22, 0, 0))
+#plot(cm)
+```
+
+### Lettres pour différencier
+
+```{r}
+cld <- multcomp::cld(cm)
+cld
+```
+
+### Les lettres dans un dataframe pour ggplot
+
+```{r}
+Le <- cld$mcletters$Letters
+L <- data.frame(engrais = levels(df$engrais),
+                lettres = Le)
+L
+```
+
+### Associer les moyennes et les écart-types pour le rapport
+
+```{r}
+diam1_moy <- df %>% 
+  group_by(engrais) %>% 
+  get_summary_stats(diam1, type = "mean_sd") %>%
+  select(-variable) %>% 
+  mutate(lettres = L$lettres)
+write_csv(diam1_moy, "tab/diametre1_moyennes.csv")
+diam1_moy
+```
+
+### Graphe avec les comparaisons
+
+```{r}
+ggplot(diam1_moy, aes(x = engrais, y = mean)) + 
+  geom_bar(stat = "identity", color = "blue", fill = "grey", width = 0.6) +
+  ylim(0, 6) +
+  theme_bw() +
+  xlab("Engrais") + ylab("Diamètre des plants - mm") +
+  theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1)) +
+  geom_text(aes(label = lettres), vjust = -0.5, size = 4)
+```
+
+
+## Diamètre 2
+
+```{r}
+df <- df_original
+```
+
+### Visualisation, boxplots
+
+```{r}
+bxp <- ggplot(df, aes(x = engrais, y = diam2)) +
+  geom_boxplot() +
+  theme_classic() +
+  xlab("Engrais") + ylab("Diamètre des plants - mm") +
+  theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
+bxp
+```
+
+### Identification des outliers extrêmes
+
+```{r}
+df_out <- df %>%
+  group_by(engrais) %>%
+  identify_outliers(diam2) %>% 
+  select(engrais, bloc, diam2, is.outlier, is.extreme)
+df_out
+```
+
+Il n'y a pas d'observation aberrante extrême.
+
+```{r}
+#df <- df %>% filter(! id %in% df_out$id)
+```
+
+
+### Le modèle ANOVA
+
+```{r}
+lm2 <- lm(diam2 ~ engrais, data = df)
+Anova(lm2)
+```
+
+À la semaine 5 après le repiquage, au moins deux types d'engrais ont des effets très significativement différents sur les Diamètres des plants. Mais vérifions les conditions de validité de l'ANOVA.
+
+### Indépendance des résidus
+
+```{r}
+plot(lm2, 1)
+```
+
+### Normalité des résidus
+
+```{r}
+plot(lm2, 2)
+```
+
+```{r}
+shapiro_test(residuals(lm2))
+```
+
+### Homogénéité des variances
+
+```{r}
+plot(lm2, 3)
+```
+
+```{r}
+levene_test(residuals(lm2) ~ engrais, data = df)
+```
+
+On retient que la conclusion de l'ANOVA peut être considérée valide. Trouvons les engrais dont les effets sont différents.
+
+### Comparaisons par paires
+
+Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais) pour identifier ceux dont les effets sont différents.
+
+```{r}
+cm <- multcomp::glht(lm2, linfct = multcomp::mcp(engrais = "Tukey"))
+summary(cm)
+```
+
+### Graph des comparaisons
+
+```{r}
+par(mar = c(0, 22, 0, 0))
+plot(cm)
+```
+
+### Lettres pour différencier
+
+```{r}
+cld <- multcomp::cld(cm)
+cld
+```
+
+### Les lettres dans un dataframe pour ggplot
+
+```{r}
+Le <- cld$mcletters$Letters
+L <- data.frame(engrais = levels(df$engrais),
+                lettres = Le)
+L
+```
+
+### Associer les moyennes et les écart-types pour le rapport
+
+```{r}
+diam2_moy <- df %>% 
+  group_by(engrais) %>% 
+  get_summary_stats(diam2, type = "mean_sd") %>%
+  select(-variable) %>% 
+  mutate(lettres = L$lettres)
+write_csv(diam2_moy, "tab/diametre2_moyennes.csv")
+diam2_moy
+```
+
+### Graphe avec les comparaisons
+
+```{r}
+ggplot(diam2_moy, aes(x = engrais, y = mean)) + 
+  geom_bar(stat = "identity", color = "blue", fill = "grey", width = 0.6) +
+  ylim(0, 8) +
+  theme_bw() +
+  xlab("Engrais") + ylab("Diamètre des plants - mm") +
+  theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1)) +
+  geom_text(aes(label = lettres), vjust = -0.5, size = 4)
+```
+
+
+## Diamètre 3
+
+```{r}
+df <- df_original
+```
+
+### Visualisation, boxplots
+
+```{r}
+bxp <- ggplot(df, aes(x = engrais, y = diam3)) +
+  geom_boxplot() +
+  theme_classic() +
+  xlab("Engrais") + ylab("Diamètre des plants - mm") +
+  theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
+bxp
+```
+
+### Identification des outliers extrêmes
+
+```{r}
+df_out <- df %>%
+  group_by(engrais) %>%
+  identify_outliers(diam3) %>% 
+  select(engrais, bloc, diam3, is.outlier, is.extreme)
+df_out
+```
+
+Il n'y a pas d'observation aberrante extrême.
+
+```{r}
+#df <- df %>% filter(! id %in% df_out$id)
+```
+
+
+### Le modèle ANOVA
+
+```{r}
+lm3 <- lm(diam3 ~ engrais, data = df)
+Anova(lm3)
+```
+
+À la semaine 6 après le repiquage, au moins deux types d'engrais ont des effets très significativement différents sur les Diamètres des plants. Mais vérifions les conditions de validité de l'ANOVA.
+
+### Indépendance des résidus
+
+```{r}
+plot(lm3, 1)
+```
+
+### Normalité des résidus
+
+```{r}
+plot(lm3, 2)
+```
+
+```{r}
+shapiro_test(residuals(lm3))
+```
+
+### Homogénéité des variances
+
+```{r}
+plot(lm3, 3)
+```
+
+```{r}
+levene_test(residuals(lm3) ~ engrais, data = df)
+```
+
+On retient que la conclusion de l'ANOVA peut être considérée valide. Trouvons les engrais dont les effets sont différents.
+
+### Comparaisons par paires
+
+Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais) pour identifier ceux dont les effets sont différents.
+
+```{r}
+cm <- multcomp::glht(lm3, linfct = multcomp::mcp(engrais = "Tukey"))
+summary(cm)
+```
+
+### Graph des comparaisons
+
+```{r}
+par(mar = c(0, 22, 0, 0))
+plot(cm)
+```
+
+### Lettres pour différencier
+
+```{r}
+cld <- multcomp::cld(cm)
+cld
+```
+
+### Les lettres dans un dataframe pour ggplot
+
+```{r}
+Le <- cld$mcletters$Letters
+L <- data.frame(engrais = levels(df$engrais),
+                lettres = Le)
+L
+```
+
+### Associer les moyennes et les écart-types pour le rapport
+
+```{r}
+diam3_moy <- df %>% 
+  group_by(engrais) %>% 
+  get_summary_stats(diam3, type = "mean_sd") %>%
+  select(-variable) %>% 
+  mutate(lettres = L$lettres)
+write_csv(diam3_moy, "tab/diametre3_moyennes.csv")
+diam3_moy
+```
+
+### Graphe avec les comparaisons
+
+```{r}
+ggplot(diam3_moy, aes(x = engrais, y = mean)) + 
+  geom_bar(stat = "identity", color = "blue", fill = "grey", width = 0.6) +
+  ylim(0, 8) +
+  theme_bw() +
+  xlab("Engrais") + ylab("Diamètre des plants - mm") +
+  theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1)) +
+  geom_text(aes(label = lettres), vjust = -0.5, size = 4)
+```
+
+
+
+## Diamètre 4
+
+```{r}
+df <- df_original
+```
+
+### Visualisation, boxplots
+
+```{r}
+bxp <- ggplot(df, aes(x = engrais, y = diam4)) +
+  geom_boxplot() +
+  theme_classic() +
+  xlab("Engrais") + ylab("Diamètre des plants - mm") +
+  theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
+bxp
+```
+
+### Identification des outliers extrêmes
+
+```{r}
+df_out <- df %>%
+  group_by(engrais) %>%
+  identify_outliers(diam4) %>% 
+  select(engrais, bloc, diam4, is.outlier, is.extreme)
+df_out
+```
+
+Il n'y a pas d'observation aberrante extrême.
+
+```{r}
+#df <- df %>% filter(! id %in% df_out$id)
+```
+
+
+### Le modèle ANOVA
+
+```{r}
+lm4 <- lm(diam4 ~ engrais, data = df)
+Anova(lm4)
+```
+
+À la semaine 7 après le repiquage, au moins deux types d'engrais ont des effets très significativement différents sur les Diamètres des plants. Mais vérifions les conditions de validité de l'ANOVA.
+
+### Indépendance des résidus
+
+```{r}
+plot(lm4, 1)
+```
+
+### Normalité des résidus
+
+```{r}
+plot(lm4, 2)
+```
+
+```{r}
+shapiro_test(residuals(lm4))
+```
+
+### Homogénéité des variances
+
+```{r}
+plot(lm4, 3)
+```
+
+```{r}
+levene_test(residuals(lm4) ~ engrais, data = df)
+```
+
+On retient que la conclusion de l'ANOVA peut être considérée valide. Trouvons les engrais dont les effets sont différents.
+
+### Comparaisons par paires
+
+Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais) pour identifier ceux dont les effets sont différents.
+
+```{r}
+cm <- multcomp::glht(lm4, linfct = multcomp::mcp(engrais = "Tukey"))
+summary(cm)
+```
+
+### Graph des comparaisons
+
+```{r}
+par(mar = c(0, 22, 0, 0))
+plot(cm)
+```
+
+### Lettres pour différencier
+
+```{r}
+cld <- multcomp::cld(cm)
+cld
+```
+
+### Les lettres dans un dataframe pour ggplot
+
+```{r}
+Le <- cld$mcletters$Letters
+L <- data.frame(engrais = levels(df$engrais),
+                lettres = Le)
+L
+```
+
+### Associer les moyennes et les écart-types pour le rapport
+
+```{r}
+diam4_moy <- df %>% 
+  group_by(engrais) %>% 
+  get_summary_stats(diam4, type = "mean_sd") %>%
+  select(-variable) %>% 
+  mutate(lettres = L$lettres)
+write_csv(diam4_moy, "tab/diametre4_moyennes.csv")
+diam4_moy
+```
+
+### Graphe avec les comparaisons
+
+```{r}
+ggplot(diam4_moy, aes(x = engrais, y = mean)) + 
+  geom_bar(stat = "identity", color = "blue", fill = "grey", width = 0.6) +
+  ylim(0, 8) +
+  theme_bw() +
+  xlab("Engrais") + ylab("Diamètre des plants - mm") +
+  theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1)) +
+  geom_text(aes(label = lettres), vjust = -0.5, size = 4)
+```
+

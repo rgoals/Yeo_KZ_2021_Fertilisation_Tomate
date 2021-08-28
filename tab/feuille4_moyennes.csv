@@ -1,0 +1,7 @@
+engrais,n,mean,sd,lettres
+Temoin,5,9.792,1.369,a
+Fumier porcs,5,12.186,1.946,a
+Fumier poulets,5,11.424,1.449,a
+Engrais mineral,5,11.878,1.799,a
+50% FPorcs + 50% Eng. Min.,5,12.614,2.471,a
+50% FPoulets + 50% Eng. Min.,5,12.884,0.588,a

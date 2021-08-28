@@ -1,0 +1,31 @@
+id,bloc,traitement,engrais,fleur1,fleur2,fleur3
+1,1,T0,Temoin,26.67,25,24
+2,1,T1,Fumier porcs,74.5,77.33,60.8
+3,1,T2,Fumier poulets,76,70.29,75.33
+4,1,T3,Engrais mineral,52.8,58.67,36
+5,1,T4,50% FPorcs + 50% Eng. Min.,64.57,72,55
+6,1,T5,50% FPoulets + 50% Eng. Min.,69.71,83.2,64
+7,2,T0,Temoin,55.5,56,45.6
+8,2,T1,Fumier porcs,54.67,67,48
+9,2,T2,Fumier poulets,62,60,74
+10,2,T3,Engrais mineral,41.14,45.6,72
+11,2,T4,50% FPorcs + 50% Eng. Min.,89,83.5,69.5
+12,2,T5,50% FPoulets + 50% Eng. Min.,81.71,72.57,60
+13,3,T0,Temoin,45.33,49.6,45.6
+14,3,T1,Fumier porcs,63,54.86,57.14
+15,3,T2,Fumier poulets,44.8,45.6,36.8
+16,3,T3,Engrais mineral,82.86,89.6,99
+17,3,T4,50% FPorcs + 50% Eng. Min.,49.33,45.33,32
+18,3,T5,50% FPoulets + 50% Eng. Min.,136.57,157.6,100.8
+19,4,T0,Temoin,38,34.67,39.33
+20,4,T1,Fumier porcs,79,74,46
+21,4,T2,Fumier poulets,53.5,50.29,48.57
+22,4,T3,Engrais mineral,64.57,60,49
+23,4,T4,50% FPorcs + 50% Eng. Min.,80,74.67,97.33
+24,4,T5,50% FPoulets + 50% Eng. Min.,66.5,93,63
+25,5,T0,Temoin,70.86,67.43,83.33
+26,5,T1,Fumier porcs,61.14,58.29,38.67
+27,5,T2,Fumier poulets,70.86,68,64
+28,5,T3,Engrais mineral,73.14,65,61
+29,5,T4,50% FPorcs + 50% Eng. Min.,85.5,81.14,64
+30,5,T5,50% FPoulets + 50% Eng. Min.,64.57,72.8,56

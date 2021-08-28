@@ -1,0 +1,31 @@
+id,bloc,traitement,engrais,rdt_tha
+1,1,T0,Temoin,0.23
+2,1,T1,Fumier porcs,0.9
+3,1,T2,Fumier poulets,1.69
+4,1,T3,Engrais mineral,0.73
+5,1,T4,50% FPorcs + 50% Eng. Min.,0.91
+6,1,T5,50% FPoulets + 50% Eng. Min.,1.09
+7,2,T0,Temoin,0.63
+8,2,T1,Fumier porcs,0.58
+9,2,T2,Fumier poulets,0.84
+10,2,T3,Engrais mineral,0.26
+11,2,T4,50% FPorcs + 50% Eng. Min.,1.22
+12,2,T5,50% FPoulets + 50% Eng. Min.,1.57
+13,3,T0,Temoin,1.15
+14,3,T1,Fumier porcs,0.97
+15,3,T2,Fumier poulets,0.78
+16,3,T3,Engrais mineral,1.06
+17,3,T4,50% FPorcs + 50% Eng. Min.,1.21
+18,3,T5,50% FPoulets + 50% Eng. Min.,3.06
+19,4,T0,Temoin,0.28
+20,4,T1,Fumier porcs,0.64
+21,4,T2,Fumier poulets,0.88
+22,4,T3,Engrais mineral,0.87
+23,4,T4,50% FPorcs + 50% Eng. Min.,0.99
+24,4,T5,50% FPoulets + 50% Eng. Min.,1.11
+25,5,T0,Temoin,1.07
+26,5,T1,Fumier porcs,0.48
+27,5,T2,Fumier poulets,1.5
+28,5,T3,Engrais mineral,0.79
+29,5,T4,50% FPorcs + 50% Eng. Min.,0.41
+30,5,T5,50% FPoulets + 50% Eng. Min.,1.28
