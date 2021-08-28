@@ -9,27 +9,14 @@ library(rstatix)
 
 ## Préparation des données
 
-Jeu de données `veg` qui contient différentes mesures dont les hauteurs de plants de tomate, mesurées 4 fois en cours de culture, lors d'un essai de fertilisation de fin novembre 2020 à mars 2021. Dispositif expérimental en bloc de Fisher avec 6 traitements en 5 répétitions :
-
-- `T0` : Témoin sans engrais
-- `T1` : Fumier porcs
-- `T2` : Fumier poulets
-- `T3` : Engrais mineral
-- `T4` : Combinaison 50% Fumier de Porcs + 50% Engrais Minéral
-- `T5` : Combinaison 50% Fumier de Poulets + 50% Engrais Minéral
-
-Une hauteur moyenne est calculée pour les 4 plants centraux mesurés le même jour de la semaine en 4 séances : 
+Jeu de données `veg.csv` qui contient différentes mesures dont les hauteurs de plants de tomate, mesurées à 4 reprises :
 
 1. `haut1` : 55 j AS, 21 j AR, semaine 3 AR
 1. `haut2` : 69 j AS, 35 j AR, semaine 5 AR 
 1. `haut3` : 76 j AS, 42 j AR, semaine 6 AR 
 1. `haut4` : 83 j AS, 49 j AR, semaine 7 AR.
 
-La question est de savoir si les différents types d'engrais induisent des augmentations de hauteur de plant significativement différentes. 
-
-> **Nous souhaitons évaluer si ces différents engrais apportent une plus value comparée au témoin; surtout si les effets diffèrent d'un type d'engrais à l'autre sur les paramètres végétatifs et/ou de rendement.**
-
-Charger le dataframe et extraire seulement les variables d'intérêt pour l'analyse de la hauteur des plants.
+La question est de savoir si les différents types d'engrais induisent des hauteurs ou augmentations de hauteur de plant significativement différentes. 
 
 ```{r}
 df <- read_csv("data/veg.csv")

@@ -9,9 +9,7 @@ library(rstatix)
 
 ## Préparation des données
 
-Jeu de données `veg` qui contient différentes mesures dont le nombre de feuilles de plants de tomate, compté 4 fois en cours de culture, lors d'un essai de fertilisation de fin novembre 2020 à mars 2021. Dispositif expérimental en bloc de Fisher avec 6 traitements en 5 répétitions tels que décrits dans le chapitre précédent.
-
-Un nombre moyen de feuilles est calculé pour les 4 plants centraux mesurés le même jour de la semaine en 4 séances : 
+Jeu de données `veg.csv` qui contient différentes mesures dont le nombre de feuilles des plants de tomate, compté à 4 reprises : 
 
 1. `feuil1` : 55 j AS, 21 j AR, semaine 3 AR
 1. `feuil2` : 69 j AS, 35 j AR, semaine 5 AR 
@@ -19,10 +17,6 @@ Un nombre moyen de feuilles est calculé pour les 4 plants centraux mesurés le 
 1. `feuil4` : 83 j AS, 49 j AR, semaine 7 AR.
 
 La question est de savoir si les différents types d'engrais induisent des qantités de feuilles significativement différentes. 
-
-> **Nous souhaitons évaluer si ces différents engrais apportent une plus value comparée au témoin; surtout si les effets diffèrent d'un type d'engrais à l'autre sur les paramètres végétatifs et/ou de rendement.**
-
-Charger le dataframe et extraire seulement les variables d'intérêt pour l'analyse du nombre de feuilles.
 
 ```{r}
 df <- read_csv("data/veg.csv")

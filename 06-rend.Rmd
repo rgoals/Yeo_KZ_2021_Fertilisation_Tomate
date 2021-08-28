@@ -9,17 +9,13 @@ library(rstatix)
 
 ## Préparation des données
 
-Jeu de données `rdt` qui contient les mesures des masses de tomates récoltées à la fin de culture.
+Jeu de données `rdt.csv` qui contient également les mesures des masses de tomates récoltées à la fin de culture.
 
 Le rendement est calculé pour les 4 plants centraux et cumule les 3 séances de récolte. 
 
 - `rdt_tha` : 116 j AS, 82 j AR, semaine 12 AR.
 
 La question est de savoir si les différents types d'engrais induisent des rendements fruits significativement différents. 
-
-> **Nous souhaitons évaluer si ces différents engrais apportent une plus value comparée au témoin; surtout si les effets diffèrent d'un type d'engrais à l'autre sur le rendement.**
-
-Charger le dataframe et extraire seulement les variables d'intérêt pour l'analyse du rendement fruits.
 
 ```{r}
 df <- read_csv("data/rdt.csv")

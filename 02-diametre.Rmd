@@ -16,20 +16,14 @@ library(rstatix)
 
 ## Préparation des données
 
-Jeu de données `veg` qui contient différentes mesures dont les diamètres de plants de tomate, mesurés 4 fois en cours de culture, lors d'un essai de fertilisation de fin novembre 2020 à mars 2021. Dispositif expérimental en bloc de Fisher avec 6 traitements en 5 répétitions tels que décrits dans le chapitre précédent.
-
-Un diamètre moyen est calculé pour les 4 plants centraux mesurés le même jour de la semaine en 4 séances : 
+Jeu de données `veg.csv` qui contient différentes mesures dont les diamètres de plants de tomate, mesurés à 4 reprises : 
 
 1. `diam1` : 55 j AS, 21 j AR, semaine 3 AR
 1. `diam2` : 69 j AS, 35 j AR, semaine 5 AR 
 1. `diam3` : 76 j AS, 42 j AR, semaine 6 AR 
 1. `diam4` : 83 j AS, 49 j AR, semaine 7 AR.
 
-La question est de savoir si les différents types d'engrais induisent des augmentations de diamètre de plant significativement différentes. 
-
-> **Nous souhaitons évaluer si ces différents engrais apportent une plus value comparée au témoin; surtout si les effets diffèrent d'un type d'engrais à l'autre sur les paramètres végétatifs et/ou de rendement.**
-
-Charger le dataframe et extraire seulement les variables d'intérêt pour l'analyse du diamètre des plants.
+La question est de savoir si les différents types d'engrais induisent des diamètres ou augmentations de diamètre de plant significativement différentes. 
 
 ```{r}
 df <- read_csv("data/veg.csv")

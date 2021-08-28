@@ -9,19 +9,13 @@ library(rstatix)
 
 ## Préparation des données
 
-Jeu de données `rdt` qui contient différentes mesures dont le Nombre de fruits, compté 3 fois en cours de culture, lors d'un essai de fertilisation de fin novembre 2020 à mars 2021. Dispositif expérimental en bloc de Fisher avec 6 traitements en 5 répétitions tels que décrits dans le chapitre précédent.
-
-Un nombre moyen de fleurs est calculé pour les 4 plants centraux mesurés le même jour de la semaine en 3 séances : 
+Jeu de données `rdt.csv` qui contient différentes mesures dont les nombres de fruits, compté à 3 reprises en cours de culture : 
 
 1. `fruit1` : 86 j AS, 52 j AR, semaine 8 AR
 1. `fruit2` : 93 j AS, 59 j AR, semaine 9 AR 
 1. `fruit3` : 100 j AS, 66 j AR, semaine 10 AR.
 
 La question est de savoir si les différents types d'engrais induisent des quantités de fruits significativement différentes. 
-
-> **Nous souhaitons évaluer si ces différents engrais apportent une plus value comparée au témoin; surtout si les effets diffèrent d'un type d'engrais à l'autre sur les paramètres végétatifs et/ou de rendement.**
-
-Charger le dataframe et extraire seulement les variables d'intérêt pour l'analyse du Nombre de fruits.
 
 ```{r}
 df <- read_csv("data/rdt.csv")
