@@ -1,0 +1,203 @@
+
+# Mesures répétées
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse) # pour la manipulation et la visualisation des données
+library(ggpubr)    # pour créer facilement des graphiques prêts à la publication
+library(rstatix)   # contient des fonctions R facilitant les analyses statistiques
+library(Rmisc)     # summarySE()
+```
+
+
+```{r}
+df <- read_csv("data/veg.csv")
+df_original <- df # copie
+```
+
+## Hauteur des plants
+
+```{r}
+df <- df %>% 
+  select(traitement, engrais, haut1, haut2, haut3, haut4) %>% 
+  convert_as_factor(traitement, engrais)
+
+df$engrais <- factor(df$engrais, 
+                     levels = c("Temoin", "Fumier porcs", "Fumier poulets", 
+                                "Engrais mineral", "50% FPorcs + 50% Eng. Min.", 
+                                "50% FPoulets + 50% Eng. Min."))
+```
+
+```{r}
+df <- df %>% 
+  filter(traitement == "T0") %>% 
+  mutate(id = 1:nrow(.), .before = 1) %>% 
+  gather(key = "temps", value = "haut", haut1, haut2, haut3, haut4) %>%
+  convert_as_factor(id, temps)
+df
+```
+
+Déterminer si les hauteurs moyennes des plants sont significativement différents entre les 4 temps.
+
+### Statistiques descriptives
+
+Calculer quelques statistiques sommaires du score d’estime de soi par groupe (temps) : moyenne et sd (écart-type)
+
+```{r}
+df %>%
+  group_by(temps) %>%
+  get_summary_stats(haut, type = "mean_sd")
+```
+
+### Visualisation
+
+Créer un box plot et ajouter (si on veut) des points correspondant à des valeurs individuelles :
+
+```{r}
+bxp <- ggplot(df, aes(x = temps, y = haut)) +
+  geom_boxplot() +
+  theme_bw()
+bxp
+```
+
+
+### Vérifier les valeurs extrêmes aberrantes
+
+```{r}
+df %>%
+  group_by(temps) %>%
+  identify_outliers(haut)
+```
+
+Il y a 3 observations extrêmes aberrantes.
+
+```{r}
+#df <- df %>% filter(!)
+```
+
+
+### Le modèle
+
+```{r}
+lm <- anova_test(data = df, 
+                 dv = haut, 
+                 wid = id, 
+                 within = temps)
+get_anova_table(lm)
+```
+
+
+### Vérification des hypothèses
+
+#### Normalité
+
+Si les données sont normalement distribuées, la p-value doit être supérieure à 0,05.
+
+```{r}
+df %>%
+  group_by(temps) %>%
+  shapiro_test(haut)
+```
+
+Le score d’estime de soi est normalement distribué à chaque point dans le temps, tel qu’évalué par le test de Shapiro-Wilk (p > 0,05).
+
+Le graphique QQ plot dessine la corrélation entre une donnée définie et la distribution normale. Créer des QQ plots pour chaque point dans le temps:
+
+```{r}
+ggqqplot(df, "haut", facet.by = "temps")
+```
+
+D’après le graphique ci-dessus, comme tous les points se situent approximativement le long de la ligne de référence, nous pouvons supposer une normalité.
+
+
+#### Sphéricité
+
+```{r}
+get_anova_table(lm)
+```
+
+Le score de l’estime de soi était statistiquement significativement différent aux différents temps pendant le régime, F(2, 18) = 55,5, p < 0,0001, eta2[g] = 0,83.
+
+#### Tests post-hoc
+
+```{r}
+pwc <- df %>%
+  pairwise_t_test(haut ~ temps, paired = TRUE, p.adjust.method = "bonferroni") %>% 
+  select(group1, group2, statistic, p, p.adj, p.adj.signif)
+pwc
+```
+
+Toutes les différences par paires sont statistiquement significatives.
+
+
+### Rapporter
+
+La hauteur des plants est statistiquement différente de façon significative aux différents points dans le temps, F(2, 18) = 55,5, p < 0,0001, eta-carré généralisé = 0,82.
+
+Des analyses post-hoc avec ajustement de Bonferroni ont révélé que toutes les différences par paires, entre les différents temps, étaient statistiquement significatives (p <= 0,05).
+
+### Visualisation : Boxplots avec p-values
+
+```{r}
+pwc <- pwc %>% add_xy_position(x = "temps")
+
+bxp + 
+  stat_pvalue_manual(pwc) +
+  labs(subtitle = get_test_label(lm, detailed = TRUE),
+       caption = get_pwc_label(pwc))
+```
+
+
+### Courbes comparées selon le type d'engrais
+
+```{r}
+df <- df_original
+
+df <- df %>% 
+  select(traitement, engrais, haut1, haut2, haut3, haut4) %>% 
+  convert_as_factor(traitement, engrais)
+
+df$engrais <- factor(df$engrais, 
+                     levels = c("Temoin", "Fumier porcs", "Fumier poulets", 
+                                "Engrais mineral", "50% FPorcs + 50% Eng. Min.", 
+                                "50% FPoulets + 50% Eng. Min."))
+
+df <- df %>% 
+  gather(key = "temps", value = "haut", haut1, haut2, haut3, haut4) %>%
+  convert_as_factor(temps)
+```
+
+
+```{r}
+ggplot(df, aes(x = temps, y = haut, fill = engrais)) +
+  geom_boxplot() +
+  #facet_wrap(engrais ~ .) +
+  theme_bw()
+```
+
+
+```{r}
+df_ic <- summarySE(df, 
+                     measurevar = "haut", 
+                     groupvars = c("engrais", "temps"))
+df_ic
+```
+
+
+```{r}
+p <- position_dodge(0) # pour éviter le chevauchement des 2 courbes
+
+ggplot(df_ic, aes(x = temps, y = haut, colour = engrais, group = engrais)) + 
+  #geom_errorbar(aes(ymin = haut - ci, ymax = haut + ci), width =.1, position = p) +
+  geom_line(position = p, size = 1) +
+  geom_point(position = p, size = 2) +
+  ylab("Hauteur de plant - cm") + xlab("Temps") +
+  theme_bw()
+```
+
+
+
+
+
+
+
+
