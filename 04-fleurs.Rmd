@@ -12,9 +12,9 @@ library(Rmisc)
 
 Jeu de données `rdt.csv` qui contient différentes mesures dont le nombre de fleurs, compté à 3 reprises en cours de culture : 
 
-1. `fleur1` : 86 j AS, 52 j AR, semaine 8 AR
-1. `fleur2` : 93 j AS, 59 j AR, semaine 9 AR 
-1. `fleur3` : 100 j AS, 66 j AR, semaine 10 AR.
+1. `fleur1` : 86 JAS, 52 JAR, semaine 8 AR
+1. `fleur2` : 93 JAS, 59 JAR, semaine 9 AR 
+1. `fleur3` : 100 JAS, 66 JAR, semaine 10 AR.
 
 La question est de savoir si les différents types d'engrais induisent des quantités de fleurs significativement différentes. 
 
@@ -42,23 +42,18 @@ df %>% sample_n_by(bloc, size = 1)
 
 ## Fleurs 1
 
-```{r}
-df <- df_original
-```
-
-
 ### Visualisation, boxplots
 
 ```{r}
 bxp <- ggplot(df, aes(x = engrais, y = fleur1)) +
   geom_boxplot() +
-  theme_classic() +
+  theme_bw() +
   xlab("Engrais") + ylab("Nombre de fleurs") +
   theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
 bxp
 ```
 
-### Identification des outliers extrêmes
+### Identification des échantillons aberrants et extrêmes
 
 ```{r}
 df_out <- df %>%
@@ -68,7 +63,7 @@ df_out <- df %>%
 df_out
 ```
 
-Il y a une observation aberrante extrême.
+Il y a une observation aberrante extrême. Écartée pour améliorer la distribution !
 
 ```{r}
 df <- df %>% filter(! id %in% df_out$id)
@@ -113,7 +108,7 @@ On retient que la conclusion de l'ANOVA peut être considérée valide : => Pas 
 
 ### Comparaisons par paires
 
-Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais).
+Tests post-hoc de comparaisons par paires entre les groupes (ici, les engrais).
 
 ```{r}
 cm <- multcomp::glht(lm1, linfct = multcomp::mcp(engrais = "Tukey"))
@@ -180,13 +175,13 @@ df <- df_original
 ```{r}
 bxp <- ggplot(df, aes(x = engrais, y = fleur2)) +
   geom_boxplot() +
-  theme_classic() +
+  theme_bw() +
   xlab("Engrais") + ylab("Nombre de fleurs") +
   theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
 bxp
 ```
 
-### Identification des outliers extrêmes
+### Identification des échantillons aberrants et extrêmes
 
 ```{r}
 df_out <- df %>%
@@ -196,10 +191,10 @@ df_out <- df %>%
 df_out
 ```
 
-Il y a une observation aberrante extrême.
+Il y a 2 observations aberrantes extrêmes. Exclues pour améliorer la distribution.
 
 ```{r}
-#df <- df %>% filter(! id %in% df_out$id)
+df <- df %>% filter(! id %in% c(16, 18)) #df_out$id)
 ```
 
 ### Le modèle ANOVA
@@ -209,7 +204,7 @@ lm2 <- lm(fleur2 ~ engrais, data = df)
 Anova(lm2)
 ```
 
-À la semaine 5 après le repiquage, au moins deux types d'engrais ont des effets très significativement différents sur le Nombre de fleurs des plants. Mais vérifions les conditions de validité de l'ANOVA.
+À la semaine 5 après le repiquage, au moins deux types d'engrais ont des effets significativement différents sur le Nombre de fleurs des plants. Mais vérifions les conditions de validité de l'ANOVA.
 
 ### Indépendance des résidus
 
@@ -240,8 +235,6 @@ levene_test(residuals(lm2) ~ engrais, data = df)
 On retient que la conclusion de l'ANOVA peut être considérée valide. Trouvons les engrais dont les effets sont différents.
 
 ### Comparaisons par paires
-
-Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais) pour identifier ceux dont les effets sont différents.
 
 ```{r}
 cm <- multcomp::glht(lm2, linfct = multcomp::mcp(engrais = "Tukey"))
@@ -307,13 +300,13 @@ df <- df_original
 ```{r}
 bxp <- ggplot(df, aes(x = engrais, y = fleur3)) +
   geom_boxplot() +
-  theme_classic() +
+  theme_bw() +
   xlab("Engrais") + ylab("Nombre de fleurs") +
   theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
 bxp
 ```
 
-### Identification des outliers extrêmes
+### Identification des échantillons aberrants et extrêmes
 
 ```{r}
 df_out <- df %>%
@@ -323,10 +316,10 @@ df_out <- df %>%
 df_out
 ```
 
-Il y a une observation aberrante extrême.
+Il y a 2 observations aberrantes extrêmes.
 
 ```{r}
-#df <- df %>% filter(! id %in% df_out$id)
+#df <- df %>% filter(! id %in% c(18, 25)) #df_out$id)
 ```
 
 ### Le modèle ANOVA
@@ -429,13 +422,12 @@ ggplot(fleur3_moy, aes(x = engrais, y = mean)) +
 df <- df_original
 
 df <- df %>% 
-  gather(key = "temps", value = "hauteur", haut1, haut2, haut3, haut4) #%>%
+  gather(key = "temps", value = "fleur", fleur1, fleur2, fleur3) #%>%
   #convert_as_factor(temps)
 
-df$temps[df$temps == "haut1"] <- "21 JAR"
-df$temps[df$temps == "haut2"] <- "35 JAR"
-df$temps[df$temps == "haut3"] <- "42 JAR"
-df$temps[df$temps == "haut4"] <- "49 JAR"
+df$temps[df$temps == "fleur1"] <- "52 JAR"
+df$temps[df$temps == "fleur2"] <- "59 JAR"
+df$temps[df$temps == "fleur3"] <- "66 JAR"
 
 df <- df %>% 
   convert_as_factor(temps)
@@ -444,19 +436,19 @@ df <- df %>%
 
 ```{r}
 df_ic <- summarySE(df, 
-                   measurevar = "hauteur", 
+                   measurevar = "fleur", 
                    groupvars = c("temps", "engrais"))
 
-write_csv(df_ic, "tab/haut_moy_temps.csv")
+write_csv(df_ic, "tab/fleur_moy_temps.csv")
 df_ic
 ```
 
 
 ```{r}
-ggplot(df_ic, aes(x = temps, y = hauteur, colour = engrais, group = engrais)) + 
+ggplot(df_ic, aes(x = temps, y = fleur, colour = engrais, group = engrais)) + 
   geom_line(size = 1) +
   geom_point(size = 2) +
-  ylab("Hauteur des plants - cm") + xlab("Temps") +
+  ylab("Nombre de fleurs") + xlab("Temps") +
   theme_bw()
 ```
 

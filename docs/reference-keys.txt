@@ -293,3 +293,9 @@ identification-des-échantillons-aberrants-et-extêmes-3
 évolution-du-nombre-de-feuilles-dans-le-temps-selon-le-type-dengrais
 évolution-du-nombre-de-fleurs-dans-le-temps-selon-le-type-dengrais
 évolution-du-nombre-de-fruits-dans-le-temps-selon-le-type-dengrais
+identification-des-échantillons-aberrants-et-extrêmes-5
+identification-des-échantillons-aberrants-et-extrêmes-6
+identification-des-échantillons-aberrants-et-extrêmes-7
+identification-des-échantillons-aberrants-et-extrêmes-8
+identification-des-échantillons-aberrants-et-extrêmes-9
+identification-des-échantillons-aberrants-et-extrêmes-10

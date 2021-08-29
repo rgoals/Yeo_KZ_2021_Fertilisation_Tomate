@@ -10,11 +10,11 @@ library(Rmisc)
 
 ## Préparation des données
 
-Jeu de données `rdt.csv` qui contient également les mesures des masses de tomates récoltées à la fin de culture.
+Jeu de données `rdt.csv` qui contient également les mesures des masses des tomates récoltées à la fin de culture.
 
 Le rendement est calculé pour les 4 plants centraux et cumule les 3 séances de récolte. 
 
-- `rdt_tha` : 116 j AS, 82 j AR, semaine 12 AR.
+- `rdt_tha` : 116 JAS, 82 JAR, semaine 12 AR.
 
 La question est de savoir si les différents types d'engrais induisent des rendements fruits significativement différents. 
 
@@ -24,7 +24,7 @@ df <- read_csv("data/rdt.csv")
 
 ```{r}
 df <- df %>% 
-  mutate(id = 1:nrow(.), .before = 1) %>% 
+  mutate(id = 1:nrow(.), before = 1) %>% 
   select(id, bloc, traitement, engrais, rdt_tha) %>% 
   convert_as_factor(traitement, engrais)
 
@@ -45,7 +45,7 @@ df %>% sample_n_by(bloc, size = 1)
 ```{r}
 bxp <- ggplot(df, aes(x = engrais, y = rdt_tha)) +
   geom_boxplot() +
-  theme_classic() +
+  theme_bw() +
   xlab("Engrais") + ylab("Rendement t/ha") +
   theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
 bxp
@@ -64,7 +64,7 @@ df_out
 Il y a 2 observations aberrantes extrêmes mais qui ne sont pas exclues.
 
 ```{r}
-#df <- df %>% filter(id != 18) #(! id %in% c(10, 18))
+#df <- df %>% filter(! id %in% c(10, 18))
 ```
 
 ### Le modèle ANOVA
@@ -89,7 +89,7 @@ plot(lm1, 2)
 ```
 
 ```{r}
-shapiro_test(residuals(lm1))
+shapiro_test(rdt_tha, data = df)
 ```
 
 ### Homogénéité des variances
@@ -104,6 +104,19 @@ levene_test(residuals(lm1) ~ engrais, data = df)
 
 On retient que la conclusion de l'ANOVA peut être considérée valide : => différence d'effet sur le rendement entre au moins deux engrais. 
 
+```{r}
+df %>% 
+  kruskal_test(rdt_tha ~ engrais)
+```
+
+```{r}
+df %>% 
+  dunn_test(rdt_tha ~ engrais, p.adjust.method = "bonferroni") %>% 
+  select(group1, group2, p, p.adj, p.adj.signif) #%>% 
+  #filter(p.adj.signif != "ns")
+```
+
+
 ### Comparaisons par paires
 
 Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais).
@@ -113,7 +126,7 @@ cm <- multcomp::glht(lm1, linfct = multcomp::mcp(engrais = "Tukey"))
 summary(cm)
 ```
 
-### Graph des comparaisons
+### Graphe des comparaisons
 
 ```{r}
 par(mar = c(0, 22, 0, 0))
