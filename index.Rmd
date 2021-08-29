@@ -1,6 +1,6 @@
 --- 
 title: "A Minimal Book Example"
-author: "zco"
+author: "**ZCO, Agronome, PhD.**"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 documentclass: book
@@ -14,11 +14,11 @@ description: "The output format for this example is bookdown::gitbook."
 
 ## Déroulement
 
-Stage L3 avec essai de fertilisation au champ. Fin novembre 2020 à mars 2021. Dispositif expérimental en bloc de Fisher avec 6 traitements en 5 répétitions :
+Stage L3 avec essai de fertilisation au champ. Fin novembre 2020 à mars 2021. Dispositif expérimental en bloc de Fisher. 6 traitements, 5 répétitions.
 
 - `T0` : Témoin sans engrais
-- `T1` : Fumier porcs
-- `T2` : Fumier poulets
+- `T1` : Fumier de porcs
+- `T2` : Fumier de poulets
 - `T3` : Engrais mineral
 - `T4` : Combinaison 50% Fumier de Porcs + 50% Engrais Minéral
 - `T5` : Combinaison 50% Fumier de Poulets + 50% Engrais Minéral
@@ -28,14 +28,14 @@ Mesures effectuées sur les 4 plants centraux le même jour pour chaque paramèt
 
 ## Objectifs de recherche
 
-La question est de savoir si les différents types d'engrais induisent :
+Savoir si les différents types d'engrais induisent :
 
-- des augmentations de hauteur des plants significativement différentes
-- des augmentations de diamètre des plants significativement différentes
-- des nombres de feuilles significativement différents
-- des nombres de fleurs significativement différents
-- des nombres de fleurs significativement différents
-- ou des rendement tomate significativement différents.
+- des augmentations de **hauteur de plants** significativement différentes
+- des augmentations de **diamètre des plants** significativement différentes
+- des **nombres de feuilles** significativement différents
+- des **nombres de fleurs** significativement différents
+- des **nombres de fruits** significativement différents
+- ou des **rendement tomate** significativement différents.
 
 > **Nous souhaitons évaluer si ces différents engrais apportent une plus value comparée au témoin; surtout si les effets diffèrent d'un type d'engrais à l'autre sur les paramètres végétatifs et/ou de rendement de la culture de tomate.**
 
@@ -46,6 +46,7 @@ La question est de savoir si les différents types d'engrais induisent :
 library(tidyverse) # pour la manipulation et la visualisation des données
 library(ggpubr)    # pour créer facilement des graphiques prêts à la publication
 library(rstatix)   # contient des fonctions R facilitant les analyses statistiques
+library(Rmisc)     # summarySE()
 ```
 
 

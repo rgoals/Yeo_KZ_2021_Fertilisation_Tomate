@@ -12,18 +12,19 @@ output: html_document
 library(tidyverse)
 library(ggpubr)
 library(rstatix)
+library(Rmisc)
 ```
 
 ## Préparation des données
 
-Jeu de données `veg.csv` qui contient différentes mesures dont les diamètres de plants de tomate, mesurés à 4 reprises : 
+Jeu de données `veg.csv` qui contient différentes mesures dont les diamètres des plants de tomate, mesurés à 4 reprises : 
 
 1. `diam1` : 55 j AS, 21 j AR, semaine 3 AR
 1. `diam2` : 69 j AS, 35 j AR, semaine 5 AR 
 1. `diam3` : 76 j AS, 42 j AR, semaine 6 AR 
 1. `diam4` : 83 j AS, 49 j AR, semaine 7 AR.
 
-La question est de savoir si les différents types d'engrais induisent des diamètres ou augmentations de diamètre de plant significativement différentes. 
+La question est de savoir si les différents types d'engrais induisent des diamètres ou augmentations de diamètre de plant significativement différentes. La démarche est la même que celle du chapitre précédent.
 
 ```{r}
 df <- read_csv("data/veg.csv")
@@ -54,19 +55,19 @@ df %>% sample_n_by(bloc, size = 1)
 ```{r}
 bxp <- ggplot(df, aes(x = engrais, y = diam1)) +
   geom_boxplot() +
-  theme_classic() +
+  theme_bw() +
   xlab("Engrais") + ylab("Diamètre des plants - mm") +
   theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
 bxp
 ```
 
-### Identification des outliers extrêmes
+### Identification des échantillons aberrants et extrêmes
 
 ```{r}
 df_out <- df %>%
   group_by(engrais) %>%
   identify_outliers(diam1) %>% 
-  select(engrais, bloc, diam1, is.outlier, is.extreme)
+  select(id, engrais, bloc, diam1, is.outlier, is.extreme)
 df_out
 ```
 
@@ -116,7 +117,7 @@ On retient que la conclusion de l'ANOVA peut être considérée valide : => Pas 
 
 ### Comparaisons par paires
 
-Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais).
+Tests post-hoc de comparaisons par paires entre les groupes (ici, les engrais).
 
 ```{r}
 cm <- multcomp::glht(lm1, linfct = multcomp::mcp(engrais = "Tukey"))
@@ -182,26 +183,26 @@ df <- df_original
 ```{r}
 bxp <- ggplot(df, aes(x = engrais, y = diam2)) +
   geom_boxplot() +
-  theme_classic() +
+  theme_bw() +
   xlab("Engrais") + ylab("Diamètre des plants - mm") +
   theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
 bxp
 ```
 
-### Identification des outliers extrêmes
+### Identification des échantillons aberrants et extrêmes
 
 ```{r}
 df_out <- df %>%
   group_by(engrais) %>%
   identify_outliers(diam2) %>% 
-  select(engrais, bloc, diam2, is.outlier, is.extreme)
+  select(id, engrais, bloc, diam2, is.outlier, is.extreme)
 df_out
 ```
 
-Il n'y a pas d'observation aberrante extrême.
+Il y a une observation aberrante extrême. Mais toutes les trois ont été exclues pour améliorer la distribution.
 
 ```{r}
-#df <- df %>% filter(! id %in% df_out$id)
+df <- df %>% filter(! id %in% df_out$id) #filter(id != 22)
 ```
 
 
@@ -212,7 +213,7 @@ lm2 <- lm(diam2 ~ engrais, data = df)
 Anova(lm2)
 ```
 
-À la semaine 5 après le repiquage, au moins deux types d'engrais ont des effets très significativement différents sur les Diamètres des plants. Mais vérifions les conditions de validité de l'ANOVA.
+À la semaine 5 après le repiquage, au moins deux types d'engrais ont des effets significativement différents sur les diamètres des plants à hauteur du collet. Mais vérifions les conditions de validité de l'ANOVA.
 
 ### Indépendance des résidus
 
@@ -240,11 +241,9 @@ plot(lm2, 3)
 levene_test(residuals(lm2) ~ engrais, data = df)
 ```
 
-On retient que la conclusion de l'ANOVA peut être considérée valide. Trouvons les engrais dont les effets sont différents.
+On va retenir que la conclusion de l'ANOVA peut être considérée valide. Trouvons les engrais dont les effets sont différents.
 
 ### Comparaisons par paires
-
-Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais) pour identifier ceux dont les effets sont différents.
 
 ```{r}
 cm <- multcomp::glht(lm2, linfct = multcomp::mcp(engrais = "Tukey"))
@@ -316,7 +315,7 @@ bxp <- ggplot(df, aes(x = engrais, y = diam3)) +
 bxp
 ```
 
-### Identification des outliers extrêmes
+### Identification des échantillons aberrants et extrêmes
 
 ```{r}
 df_out <- df %>%
@@ -326,7 +325,7 @@ df_out <- df %>%
 df_out
 ```
 
-Il n'y a pas d'observation aberrante extrême.
+Il y a 4 observations aberrantes extrêmes.
 
 ```{r}
 #df <- df %>% filter(! id %in% df_out$id)
@@ -340,7 +339,7 @@ lm3 <- lm(diam3 ~ engrais, data = df)
 Anova(lm3)
 ```
 
-À la semaine 6 après le repiquage, au moins deux types d'engrais ont des effets très significativement différents sur les Diamètres des plants. Mais vérifions les conditions de validité de l'ANOVA.
+À la semaine 6 après le repiquage, au moins deux types d'engrais ont des effets significativement différents sur les Diamètres des plants. Mais vérifions les conditions de validité de l'ANOVA.
 
 ### Indépendance des résidus
 
@@ -371,8 +370,6 @@ levene_test(residuals(lm3) ~ engrais, data = df)
 On retient que la conclusion de l'ANOVA peut être considérée valide. Trouvons les engrais dont les effets sont différents.
 
 ### Comparaisons par paires
-
-Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais) pour identifier ceux dont les effets sont différents.
 
 ```{r}
 cm <- multcomp::glht(lm3, linfct = multcomp::mcp(engrais = "Tukey"))
@@ -439,13 +436,13 @@ df <- df_original
 ```{r}
 bxp <- ggplot(df, aes(x = engrais, y = diam4)) +
   geom_boxplot() +
-  theme_classic() +
+  theme_bw() +
   xlab("Engrais") + ylab("Diamètre des plants - mm") +
   theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
 bxp
 ```
 
-### Identification des outliers extrêmes
+### Identification des échantillons aberrants et extrêmes
 
 ```{r}
 df_out <- df %>%
@@ -499,9 +496,8 @@ levene_test(residuals(lm4) ~ engrais, data = df)
 
 On retient que la conclusion de l'ANOVA peut être considérée valide. Trouvons les engrais dont les effets sont différents.
 
-### Comparaisons par paires
 
-Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais) pour identifier ceux dont les effets sont différents.
+### Comparaisons par paires
 
 ```{r}
 cm <- multcomp::glht(lm4, linfct = multcomp::mcp(engrais = "Tukey"))
@@ -554,4 +550,48 @@ ggplot(diam4_moy, aes(x = engrais, y = mean)) +
   theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1)) +
   geom_text(aes(label = lettres), vjust = -0.5, size = 4)
 ```
+
+
+### Évolution du diamètre au collet des plants dans le temps selon le type d'engrais
+
+```{r}
+df <- df_original
+
+df <- df %>% 
+  gather(key = "temps", value = "diametre", diam1, diam2, diam3, diam4) #%>%
+  #convert_as_factor(temps)
+
+df$temps[df$temps == "diam1"] <- "21 JAR"
+df$temps[df$temps == "diam2"] <- "35 JAR"
+df$temps[df$temps == "diam3"] <- "42 JAR"
+df$temps[df$temps == "diam4"] <- "49 JAR"
+
+df <- df %>% 
+  convert_as_factor(temps)
+```
+
+
+```{r}
+df_ic <- summarySE(df, 
+                   measurevar = "diametre", 
+                   groupvars = c("temps", "engrais"))
+
+write_csv(df_ic, "tab/diam_moy_temps.csv")
+df_ic
+```
+
+
+```{r}
+ggplot(df_ic, aes(x = temps, y = diametre, colour = engrais, group = engrais)) + 
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  ylab("Diamètre au collet des plants - cm") + xlab("Temps") +
+  theme_bw()
+```
+
+
+
+
+
+
 

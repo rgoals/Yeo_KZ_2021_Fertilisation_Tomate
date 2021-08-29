@@ -5,18 +5,19 @@
 library(tidyverse)
 library(ggpubr)
 library(rstatix)
+library(Rmisc)
 ```
 
 ## Préparation des données
 
-Jeu de données `veg.csv` qui contient différentes mesures dont les hauteurs de plants de tomate, mesurées à 4 reprises :
+Jeu de données `veg.csv` qui contient différentes mesures dont les **hauteurs des plants** de tomate, mesurées à 4 reprises :
 
 1. `haut1` : 55 j AS, 21 j AR, semaine 3 AR
 1. `haut2` : 69 j AS, 35 j AR, semaine 5 AR 
 1. `haut3` : 76 j AS, 42 j AR, semaine 6 AR 
 1. `haut4` : 83 j AS, 49 j AR, semaine 7 AR.
 
-La question est de savoir si les différents types d'engrais induisent des hauteurs ou augmentations de hauteur de plant significativement différentes. 
+La question est de savoir si les différents types d'engrais induisent des hauteurs ou augmentations de hauteur de plants significativement différentes. 
 
 ```{r}
 df <- read_csv("data/veg.csv")
@@ -47,19 +48,19 @@ df %>% sample_n_by(bloc, size = 1)
 ```{r}
 bxp <- ggplot(df, aes(x = engrais, y = haut1)) +
   geom_boxplot() +
-  theme_classic() +
+  theme_bw() +
   xlab("Engrais") + ylab("Hauteur des plants - cm") +
   theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
 bxp
 ```
 
-### Identification des outliers extrêmes
+### Identification des échantillons aberrants extrêmes
 
 ```{r}
 df_out <- df %>%
   group_by(engrais) %>%
   identify_outliers(haut1) %>% 
-  select(engrais, bloc, haut1, is.outlier, is.extreme)
+  select(id, engrais, bloc, haut1, is.outlier, is.extreme)
 df_out
 ```
 
@@ -77,7 +78,7 @@ lm1 <- lm(haut1 ~ engrais, data = df)
 Anova(lm1)
 ```
 
-À la semaine 3 après le repiquage, il ne serait pas encore possible d'établir des différences significatives entre les effets des traitements sur les hauteurs des plants. Mais vérifions les conditions de validité de l'ANOVA.
+À la semaine 3 après le repiquage (21 JAR), il ne serait pas encore possible d'établir des différences significatives entre les effets des traitements sur les hauteurs des plants. Mais vérifions d'abord les conditions de validité de l'ANOVA.
 
 ### Indépendance des résidus
 
@@ -105,18 +106,18 @@ plot(lm1, 3)
 levene_test(residuals(lm1) ~ engrais, data = df)
 ```
 
-On retient que la conclusion de l'ANOVA peut être considérée valide : => Pas de différence d'effet sur la hauteur des plants à cette date. 
+On retient que la conclusion de l'ANOVA peut être considérée valide : => Pas de différence significative d'effet sur la hauteur des plants à cette date entre les engrais. 
 
 ### Comparaisons par paires
 
-Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais) pour identifier ceux dont les effets sont différents.
+Tests post-hoc de comparaisons par paires entre les groupes (ici, les engrais) - aux fins du rapport de stage.
 
 ```{r}
 cm <- multcomp::glht(lm1, linfct = multcomp::mcp(engrais = "Tukey"))
 #summary(cm)
 ```
 
-### Graph des comparaisons
+### Graphe des comparaisons
 
 ```{r}
 #par(mar = c(0, 22, 0, 0))
@@ -175,26 +176,26 @@ df <- df_original
 ```{r}
 bxp <- ggplot(df, aes(x = engrais, y = haut2)) +
   geom_boxplot() +
-  theme_classic() +
+  theme_bw() +
   xlab("Engrais") + ylab("Hauteur des plants - cm") +
   theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
 bxp
 ```
 
-### Identification des outliers extrêmes
+### Identification des échantillons aberrants extrêmes
 
 ```{r}
 df_out <- df %>%
   group_by(engrais) %>%
   identify_outliers(haut2) %>% 
-  select(engrais, bloc, haut2, is.outlier, is.extreme)
+  select(id, engrais, bloc, haut2, is.outlier, is.extreme)
 df_out
 ```
 
-Il n'y a pas d'observation aberrante extrême.
+Il y a 3 observation classées aberrantes et extrêmes. Elles n'ont pas été exclues !
 
 ```{r}
-#df <- df %>% filter(! id %in% df_out$id)
+#df <- df %>% filter(!id %in% c(1, 7, 23)) #filter(! id %in% df_out$id) # 
 ```
 
 
@@ -205,7 +206,7 @@ lm2 <- lm(haut2 ~ engrais, data = df)
 Anova(lm2)
 ```
 
-À la semaine 5 après le repiquage, au moins deux types d'engrais ont des effets très significativement différents sur les hauteurs des plants. Mais vérifions les conditions de validité de l'ANOVA.
+À la semaine 5 après le repiquage (35 JAR), au moins deux types d'engrais ont des effets très significativement différents sur les hauteurs des plants. Mais vérifions les conditions de validité de l'ANOVA.
 
 ### Indépendance des résidus
 
@@ -233,23 +234,26 @@ plot(lm2, 3)
 levene_test(residuals(lm2) ~ engrais, data = df)
 ```
 
-On retient que la conclusion de l'ANOVA peut être considérée valide. Trouvons les engrais dont les effets sont différents.
+On retiendra que la conclusion de l'ANOVA peut être considérée valide. Trouvons les engrais dont les effets sont différents.
+
 
 ### Comparaisons par paires
-
-Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais) pour identifier ceux dont les effets sont différents.
 
 ```{r}
 cm <- multcomp::glht(lm2, linfct = multcomp::mcp(engrais = "Tukey"))
 summary(cm)
 ```
 
-### Graph des comparaisons
+
+### Graphe des comparaisons
 
 ```{r}
 par(mar = c(0, 22, 0, 0))
 plot(cm)
 ```
+
+Il faut simplement noter que pour toute paire de comparaison, la différence est significative seulement si le segment de droite ne croise pas le ligne verticale en pointillés (le zéro).
+
 
 ### Lettres pour différencier
 
@@ -303,26 +307,26 @@ df <- df_original
 ```{r}
 bxp <- ggplot(df, aes(x = engrais, y = haut3)) +
   geom_boxplot() +
-  theme_classic() +
+  theme_bw() +
   xlab("Engrais") + ylab("Hauteur des plants - cm") +
   theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
 bxp
 ```
 
-### Identification des outliers extrêmes
+### Identification des échantillons aberrants et extrêmes
 
 ```{r}
 df_out <- df %>%
   group_by(engrais) %>%
   identify_outliers(haut3) %>% 
-  select(engrais, bloc, haut3, is.outlier, is.extreme)
+  select(id, engrais, bloc, haut3, is.outlier, is.extreme)
 df_out
 ```
 
-Il n'y a pas d'observation aberrante extrême.
+Il y a une observation aberrante et extrême. Mais elle n'est pas écartée.
 
 ```{r}
-#df <- df %>% filter(! id %in% df_out$id)
+#df <- df %>% filter(id != 1) # filter(! id %in% df_out$id)
 ```
 
 
@@ -364,8 +368,6 @@ levene_test(residuals(lm3) ~ engrais, data = df)
 On retient que la conclusion de l'ANOVA peut être considérée valide. Trouvons les engrais dont les effets sont différents.
 
 ### Comparaisons par paires
-
-Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais) pour identifier ceux dont les effets sont différents.
 
 ```{r}
 cm <- multcomp::glht(lm3, linfct = multcomp::mcp(engrais = "Tukey"))
@@ -431,19 +433,19 @@ df <- df_original
 ```{r}
 bxp <- ggplot(df, aes(x = engrais, y = haut4)) +
   geom_boxplot() +
-  theme_classic() +
+  theme_bw() +
   xlab("Engrais") + ylab("Hauteur des plants - cm") +
   theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
 bxp
 ```
 
-### Identification des outliers extrêmes
+### Identification des échantillons aberrants extrêmes
 
 ```{r}
 df_out <- df %>%
   group_by(engrais) %>%
   identify_outliers(haut4) %>% 
-  select(engrais, bloc, haut4, is.outlier, is.extreme)
+  select(id, engrais, bloc, haut4, is.outlier, is.extreme)
 df_out
 ```
 
@@ -492,8 +494,6 @@ levene_test(residuals(lm4) ~ engrais, data = df)
 On retient que la conclusion de l'ANOVA peut être considérée valide. Trouvons les engrais dont les effets sont différents.
 
 ### Comparaisons par paires
-
-Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais) pour identifier ceux dont les effets sont différents.
 
 ```{r}
 cm <- multcomp::glht(lm4, linfct = multcomp::mcp(engrais = "Tukey"))
@@ -546,6 +546,56 @@ ggplot(haut4_moy, aes(x = engrais, y = mean)) +
   theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1)) +
   geom_text(aes(label = lettres), vjust = -0.5, size = 4)
 ```
+
+
+### Évolution de la hauteur des plants dans le temps selon le type d'engrais
+
+```{r}
+df <- df_original
+
+df <- df %>% 
+  gather(key = "temps", value = "hauteur", haut1, haut2, haut3, haut4) #%>%
+  #convert_as_factor(temps)
+
+df$temps[df$temps == "haut1"] <- "21 JAR"
+df$temps[df$temps == "haut2"] <- "35 JAR"
+df$temps[df$temps == "haut3"] <- "42 JAR"
+df$temps[df$temps == "haut4"] <- "49 JAR"
+
+df <- df %>% 
+  convert_as_factor(temps)
+```
+
+
+```{r}
+df_ic <- summarySE(df, 
+                   measurevar = "hauteur", 
+                   groupvars = c("temps", "engrais"))
+
+write_csv(df_ic, "tab/haut_moy_temps.csv")
+df_ic
+```
+
+
+```{r}
+ggplot(df_ic, aes(x = temps, y = hauteur, colour = engrais, group = engrais)) + 
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  ylab("Hauteur des plants - cm") + xlab("Temps") +
+  theme_bw()
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

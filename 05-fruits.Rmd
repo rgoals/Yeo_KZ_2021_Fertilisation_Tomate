@@ -5,6 +5,7 @@
 library(tidyverse)
 library(ggpubr)
 library(rstatix)
+library(Rmisc)
 ```
 
 ## Préparation des données
@@ -417,7 +418,42 @@ ggplot(fruit3_moy, aes(x = engrais, y = mean)) +
 ```
 
 
+### Évolution du nombre de fruits dans le temps selon le type d'engrais
 
+```{r}
+df <- df_original
+
+df <- df %>% 
+  gather(key = "temps", value = "hauteur", haut1, haut2, haut3, haut4) #%>%
+  #convert_as_factor(temps)
+
+df$temps[df$temps == "haut1"] <- "21 JAR"
+df$temps[df$temps == "haut2"] <- "35 JAR"
+df$temps[df$temps == "haut3"] <- "42 JAR"
+df$temps[df$temps == "haut4"] <- "49 JAR"
+
+df <- df %>% 
+  convert_as_factor(temps)
+```
+
+
+```{r}
+df_ic <- summarySE(df, 
+                   measurevar = "hauteur", 
+                   groupvars = c("temps", "engrais"))
+
+write_csv(df_ic, "tab/haut_moy_temps.csv")
+df_ic
+```
+
+
+```{r}
+ggplot(df_ic, aes(x = temps, y = hauteur, colour = engrais, group = engrais)) + 
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  ylab("Hauteur des plants - cm") + xlab("Temps") +
+  theme_bw()
+```
 
 
 

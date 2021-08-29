@@ -5,6 +5,7 @@
 library(tidyverse)
 library(ggpubr)
 library(rstatix)
+library(Rmisc)
 ```
 
 ## Préparation des données
@@ -48,26 +49,26 @@ df %>% sample_n_by(bloc, size = 1)
 ```{r}
 bxp <- ggplot(df, aes(x = engrais, y = feuil1)) +
   geom_boxplot() +
-  theme_classic() +
+  theme_bw() +
   xlab("Engrais") + ylab("Nombre de feuilles") +
   theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
 bxp
 ```
 
-### Identification des outliers extrêmes
+### Identification des échantillons aberrants et extêmes
 
 ```{r}
 df_out <- df %>%
   group_by(engrais) %>%
   identify_outliers(feuil1) %>% 
-  select(engrais, bloc, feuil1, is.outlier, is.extreme)
+  select(id, engrais, bloc, feuil1, is.outlier, is.extreme)
 df_out
 ```
 
-Il n'y a pas d'observation aberrante extrême.
+Il y a 2 observations aberrantes extrêmes. Pas exclues !
 
 ```{r}
-#df <- df %>% filter(! id %in% df_out$id)
+#df <- df %>% filter(! id %in% c(3, 9)) #df_out$id)
 ```
 
 
@@ -110,7 +111,7 @@ On retient que la conclusion de l'ANOVA peut être considérée valide : => Pas 
 
 ### Comparaisons par paires
 
-Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais).
+Tests post-hoc de comparaisons par paires entre les groupes (ici, les engrais).
 
 ```{r}
 cm <- multcomp::glht(lm1, linfct = multcomp::mcp(engrais = "Tukey"))
@@ -176,19 +177,19 @@ df <- df_original
 ```{r}
 bxp <- ggplot(df, aes(x = engrais, y = feuil2)) +
   geom_boxplot() +
-  theme_classic() +
+  theme_bw() +
   xlab("Engrais") + ylab("Nombre de feuilles") +
   theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
 bxp
 ```
 
-### Identification des outliers extrêmes
+### Identification des échantillons aberrants et extêmes
 
 ```{r}
 df_out <- df %>%
   group_by(engrais) %>%
   identify_outliers(feuil2) %>% 
-  select(engrais, bloc, feuil2, is.outlier, is.extreme)
+  select(id, engrais, bloc, feuil2, is.outlier, is.extreme)
 df_out
 ```
 
@@ -238,14 +239,12 @@ On retient que la conclusion de l'ANOVA peut être considérée valide. Trouvons
 
 ### Comparaisons par paires
 
-Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais) pour identifier ceux dont les effets sont différents.
-
 ```{r}
 cm <- multcomp::glht(lm2, linfct = multcomp::mcp(engrais = "Tukey"))
 summary(cm)
 ```
 
-### Graph des comparaisons
+### Graphe des comparaisons
 
 ```{r}
 par(mar = c(0, 22, 0, 0))
@@ -304,26 +303,26 @@ df <- df_original
 ```{r}
 bxp <- ggplot(df, aes(x = engrais, y = feuil3)) +
   geom_boxplot() +
-  theme_classic() +
+  theme_bw() +
   xlab("Engrais") + ylab("Nombre de feuilles") +
   theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
 bxp
 ```
 
-### Identification des outliers extrêmes
+### Identification des échantillons aberrants et extêmes
 
 ```{r}
 df_out <- df %>%
   group_by(engrais) %>%
   identify_outliers(feuil3) %>% 
-  select(engrais, bloc, feuil3, is.outlier, is.extreme)
+  select(id, engrais, bloc, feuil3, is.outlier, is.extreme)
 df_out
 ```
 
 Il n'y a pas d'observation aberrante extrême.
 
 ```{r}
-#df <- df %>% filter(! id %in% df_out$id)
+df <- df %>% filter(! id %in% df_out$id)
 ```
 
 
@@ -432,13 +431,13 @@ df <- df_original
 ```{r}
 bxp <- ggplot(df, aes(x = engrais, y = feuil4)) +
   geom_boxplot() +
-  theme_classic() +
+  theme_bw() +
   xlab("Engrais") + ylab("Nombre de feuilles") +
   theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1))
 bxp
 ```
 
-### Identification des outliers extrêmes
+### Identification des échantillons aberrants et extêmes
 
 ```{r}
 df_out <- df %>%
@@ -462,7 +461,7 @@ lm4 <- lm(feuil4 ~ engrais, data = df)
 Anova(lm4)
 ```
 
-À la semaine 7 après le repiquage, il n'y aurait également pad d'effets significativement différents sur le nombre de feuilles des plants. Mais vérifions les conditions de validité de l'ANOVA.
+À la semaine 7 après le repiquage, il n'y aurait également pas d'effets significativement différents sur le nombre de feuilles des plants. Mais vérifions les conditions de validité de l'ANOVA.
 
 ### Indépendance des résidus
 
@@ -548,3 +547,43 @@ ggplot(feuil4_moy, aes(x = engrais, y = mean)) +
   theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1)) +
   geom_text(aes(label = lettres), vjust = -0.5, size = 4)
 ```
+
+
+### Évolution du nombre de feuilles dans le temps selon le type d'engrais
+
+```{r}
+df <- df_original
+
+df <- df %>% 
+  gather(key = "temps", value = "feuille", feuil1, feuil2, feuil3, feuil4) #%>%
+  #convert_as_factor(temps)
+
+df$temps[df$temps == "feuil1"] <- "21 JAR"
+df$temps[df$temps == "feuil2"] <- "35 JAR"
+df$temps[df$temps == "feuil3"] <- "42 JAR"
+df$temps[df$temps == "feuil4"] <- "49 JAR"
+
+df <- df %>% 
+  convert_as_factor(temps)
+```
+
+
+```{r}
+df_ic <- summarySE(df, 
+                   measurevar = "feuille", 
+                   groupvars = c("temps", "engrais"))
+
+write_csv(df_ic, "tab/feuil_moy_temps.csv")
+df_ic
+```
+
+
+```{r}
+ggplot(df_ic, aes(x = temps, y = feuille, colour = engrais, group = engrais)) + 
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  ylab("Nombre de feuilles") + xlab("Temps") +
+  theme_bw()
+```
+
+
