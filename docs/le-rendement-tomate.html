@@ -458,7 +458,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><code>rdt_tha</code> : 116 JAS, 82 JAR, semaine 12 AR.</li>
 </ul>
 <p>La question est de savoir si les différents types d’engrais induisent des rendements fruits significativement différents.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">df &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/rdt.csv&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb463"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb463-1" title="1">df &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/rdt.csv&quot;</span>)</a></code></pre></div>
 <pre><code>## 
 ## -- Column specification --------------------------------------------------------
 ## cols(
@@ -479,20 +479,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##   rdt_kgha = col_double(),
 ##   rdt_tha = col_double()
 ## )</code></pre>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">df &lt;-<span class="st"> </span>df <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb3-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">id =</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(.), <span class="dt">before =</span> <span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb3-3" title="3"><span class="st">  </span><span class="kw">select</span>(id, bloc, traitement, engrais, rdt_tha) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb3-4" title="4"><span class="st">  </span><span class="kw">convert_as_factor</span>(traitement, engrais)</a>
-<a class="sourceLine" id="cb3-5" title="5"></a>
-<a class="sourceLine" id="cb3-6" title="6">df<span class="op">$</span>engrais &lt;-<span class="st"> </span><span class="kw">factor</span>(df<span class="op">$</span>engrais, </a>
-<a class="sourceLine" id="cb3-7" title="7">                     <span class="dt">levels =</span> <span class="kw">c</span>(<span class="st">&quot;Temoin&quot;</span>, <span class="st">&quot;Fumier porcs&quot;</span>, <span class="st">&quot;Fumier poulets&quot;</span>, </a>
-<a class="sourceLine" id="cb3-8" title="8">                                <span class="st">&quot;Engrais mineral&quot;</span>, <span class="st">&quot;50% FPorcs + 50% Eng. Min.&quot;</span>, </a>
-<a class="sourceLine" id="cb3-9" title="9">                                <span class="st">&quot;50% FPoulets + 50% Eng. Min.&quot;</span>))</a>
-<a class="sourceLine" id="cb3-10" title="10"></a>
-<a class="sourceLine" id="cb3-11" title="11"><span class="kw">write_csv</span>(df, <span class="st">&quot;tab/rdt_tha.csv&quot;</span>)</a>
-<a class="sourceLine" id="cb3-12" title="12"></a>
-<a class="sourceLine" id="cb3-13" title="13"><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
-<a class="sourceLine" id="cb3-14" title="14">df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">sample_n_by</span>(bloc, <span class="dt">size =</span> <span class="dv">1</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb465"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb465-1" title="1">df &lt;-<span class="st"> </span>df <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb465-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">id =</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(.), <span class="dt">before =</span> <span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb465-3" title="3"><span class="st">  </span><span class="kw">select</span>(id, bloc, traitement, engrais, rdt_tha) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb465-4" title="4"><span class="st">  </span><span class="kw">convert_as_factor</span>(traitement, engrais)</a>
+<a class="sourceLine" id="cb465-5" title="5"></a>
+<a class="sourceLine" id="cb465-6" title="6">df<span class="op">$</span>engrais &lt;-<span class="st"> </span><span class="kw">factor</span>(df<span class="op">$</span>engrais, </a>
+<a class="sourceLine" id="cb465-7" title="7">                     <span class="dt">levels =</span> <span class="kw">c</span>(<span class="st">&quot;Temoin&quot;</span>, <span class="st">&quot;Fumier porcs&quot;</span>, <span class="st">&quot;Fumier poulets&quot;</span>, </a>
+<a class="sourceLine" id="cb465-8" title="8">                                <span class="st">&quot;Engrais mineral&quot;</span>, <span class="st">&quot;50% FPorcs + 50% Eng. Min.&quot;</span>, </a>
+<a class="sourceLine" id="cb465-9" title="9">                                <span class="st">&quot;50% FPoulets + 50% Eng. Min.&quot;</span>))</a>
+<a class="sourceLine" id="cb465-10" title="10"></a>
+<a class="sourceLine" id="cb465-11" title="11"><span class="kw">write_csv</span>(df, <span class="st">&quot;tab/rdt_tha.csv&quot;</span>)</a>
+<a class="sourceLine" id="cb465-12" title="12"></a>
+<a class="sourceLine" id="cb465-13" title="13"><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
+<a class="sourceLine" id="cb465-14" title="14">df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">sample_n_by</span>(bloc, <span class="dt">size =</span> <span class="dv">1</span>)</a></code></pre></div>
 <pre><code>## # A tibble: 5 x 5
 ##      id  bloc traitement engrais                      rdt_tha
 ##   &lt;int&gt; &lt;dbl&gt; &lt;fct&gt;      &lt;fct&gt;                          &lt;dbl&gt;
@@ -504,21 +504,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="visualisation-boxplots-18" class="section level2">
 <h2><span class="header-section-number">7.2</span> Visualisation, boxplots</h2>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">bxp &lt;-<span class="st"> </span><span class="kw">ggplot</span>(df, <span class="kw">aes</span>(<span class="dt">x =</span> engrais, <span class="dt">y =</span> rdt_tha)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb5-2" title="2"><span class="st">  </span><span class="kw">geom_boxplot</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb5-3" title="3"><span class="st">  </span><span class="kw">theme_bw</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb5-4" title="4"><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;Engrais&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ylab</span>(<span class="st">&quot;Rendement t/ha&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb5-5" title="5"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">45</span>, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">vjust =</span> <span class="dv">1</span>, <span class="dt">hjust =</span> <span class="dv">1</span>))</a>
-<a class="sourceLine" id="cb5-6" title="6">bxp</a></code></pre></div>
-<p><img src="Yeo_KZ_2021_Fertilisation_Tomate_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<div class="sourceCode" id="cb467"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb467-1" title="1">bxp &lt;-<span class="st"> </span><span class="kw">ggplot</span>(df, <span class="kw">aes</span>(<span class="dt">x =</span> engrais, <span class="dt">y =</span> rdt_tha)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb467-2" title="2"><span class="st">  </span><span class="kw">geom_boxplot</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb467-3" title="3"><span class="st">  </span><span class="kw">theme_bw</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb467-4" title="4"><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;Engrais&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ylab</span>(<span class="st">&quot;Rendement t/ha&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb467-5" title="5"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">45</span>, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">vjust =</span> <span class="dv">1</span>, <span class="dt">hjust =</span> <span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb467-6" title="6">bxp</a></code></pre></div>
+<p><img src="Yeo_KZ_2021_Fertilisation_Tomate_files/figure-html/unnamed-chunk-319-1.png" width="672" /></p>
 </div>
 <div id="identification-des-échantillons-aberrants-extrêmes-3" class="section level2">
 <h2><span class="header-section-number">7.3</span> Identification des échantillons aberrants extrêmes</h2>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">df_out &lt;-<span class="st"> </span>df <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb6-2" title="2"><span class="st">  </span><span class="kw">group_by</span>(engrais) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb6-3" title="3"><span class="st">  </span><span class="kw">identify_outliers</span>(rdt_tha) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb6-4" title="4"><span class="st">  </span><span class="kw">select</span>(id, engrais, bloc, rdt_tha, is.outlier, is.extreme)</a>
-<a class="sourceLine" id="cb6-5" title="5">df_out</a></code></pre></div>
+<div class="sourceCode" id="cb468"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb468-1" title="1">df_out &lt;-<span class="st"> </span>df <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb468-2" title="2"><span class="st">  </span><span class="kw">group_by</span>(engrais) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb468-3" title="3"><span class="st">  </span><span class="kw">identify_outliers</span>(rdt_tha) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb468-4" title="4"><span class="st">  </span><span class="kw">select</span>(id, engrais, bloc, rdt_tha, is.outlier, is.extreme)</a>
+<a class="sourceLine" id="cb468-5" title="5">df_out</a></code></pre></div>
 <pre><code>## # A tibble: 3 x 6
 ##      id engrais                       bloc rdt_tha is.outlier is.extreme
 ##   &lt;int&gt; &lt;fct&gt;                        &lt;dbl&gt;   &lt;dbl&gt; &lt;lgl&gt;      &lt;lgl&gt;     
@@ -526,11 +526,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 2    29 50% FPorcs + 50% Eng. Min.       5    0.41 TRUE       FALSE     
 ## 3    18 50% FPoulets + 50% Eng. Min.     3    3.06 TRUE       TRUE</code></pre>
 <p>Il y a 2 observations aberrantes extrêmes mais qui ne sont pas exclues.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co">#df &lt;- df %&gt;% filter(! id %in% c(10, 18))</span></a></code></pre></div>
+<div class="sourceCode" id="cb470"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb470-1" title="1"><span class="co">#df &lt;- df %&gt;% filter(! id %in% c(10, 18))</span></a></code></pre></div>
 <div id="le-modèle-anova-18" class="section level3">
 <h3><span class="header-section-number">7.3.1</span> Le modèle ANOVA</h3>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">lm &lt;-<span class="st"> </span><span class="kw">lm</span>(rdt_tha <span class="op">~</span><span class="st"> </span>engrais, <span class="dt">data =</span> df)</a>
-<a class="sourceLine" id="cb9-2" title="2"><span class="kw">Anova</span>(lm)</a></code></pre></div>
+<div class="sourceCode" id="cb471"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb471-1" title="1">lm &lt;-<span class="st"> </span><span class="kw">lm</span>(rdt_tha <span class="op">~</span><span class="st"> </span>engrais, <span class="dt">data =</span> df)</a>
+<a class="sourceLine" id="cb471-2" title="2"><span class="kw">Anova</span>(lm)</a></code></pre></div>
 <pre><code>## Anova Table (Type II tests)
 ## 
 ## Response: rdt_tha
@@ -543,14 +543,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="indépendance-des-résidus-18" class="section level3">
 <h3><span class="header-section-number">7.3.2</span> Indépendance des résidus</h3>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw">plot</span>(lm, <span class="dv">1</span>)</a></code></pre></div>
-<p><img src="Yeo_KZ_2021_Fertilisation_Tomate_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<div class="sourceCode" id="cb473"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb473-1" title="1"><span class="kw">plot</span>(lm, <span class="dv">1</span>)</a></code></pre></div>
+<p><img src="Yeo_KZ_2021_Fertilisation_Tomate_files/figure-html/unnamed-chunk-323-1.png" width="672" /></p>
 </div>
 <div id="normalité-des-résidus-18" class="section level3">
 <h3><span class="header-section-number">7.3.3</span> Normalité des résidus</h3>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="kw">plot</span>(lm, <span class="dv">2</span>)</a></code></pre></div>
-<p><img src="Yeo_KZ_2021_Fertilisation_Tomate_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="kw">shapiro_test</span>(rdt_tha, <span class="dt">data =</span> df)</a></code></pre></div>
+<div class="sourceCode" id="cb474"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb474-1" title="1"><span class="kw">plot</span>(lm, <span class="dv">2</span>)</a></code></pre></div>
+<p><img src="Yeo_KZ_2021_Fertilisation_Tomate_files/figure-html/unnamed-chunk-324-1.png" width="672" /></p>
+<div class="sourceCode" id="cb475"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb475-1" title="1"><span class="kw">shapiro_test</span>(rdt_tha, <span class="dt">data =</span> df)</a></code></pre></div>
 <pre><code>## # A tibble: 1 x 3
 ##   variable statistic        p
 ##   &lt;chr&gt;        &lt;dbl&gt;    &lt;dbl&gt;
@@ -558,23 +558,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="homogénéité-des-variances-18" class="section level3">
 <h3><span class="header-section-number">7.3.4</span> Homogénéité des variances</h3>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="kw">plot</span>(lm, <span class="dv">3</span>)</a></code></pre></div>
-<p><img src="Yeo_KZ_2021_Fertilisation_Tomate_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1"><span class="kw">levene_test</span>(<span class="kw">residuals</span>(lm) <span class="op">~</span><span class="st"> </span>engrais, <span class="dt">data =</span> df)</a></code></pre></div>
+<div class="sourceCode" id="cb477"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb477-1" title="1"><span class="kw">plot</span>(lm, <span class="dv">3</span>)</a></code></pre></div>
+<p><img src="Yeo_KZ_2021_Fertilisation_Tomate_files/figure-html/unnamed-chunk-326-1.png" width="672" /></p>
+<div class="sourceCode" id="cb478"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb478-1" title="1"><span class="kw">levene_test</span>(<span class="kw">residuals</span>(lm) <span class="op">~</span><span class="st"> </span>engrais, <span class="dt">data =</span> df)</a></code></pre></div>
 <pre><code>## # A tibble: 1 x 4
 ##     df1   df2 statistic     p
 ##   &lt;int&gt; &lt;int&gt;     &lt;dbl&gt; &lt;dbl&gt;
 ## 1     5    24     0.528 0.753</code></pre>
 <p>On retient que la conclusion de l’ANOVA peut être considérée valide : =&gt; différence d’effet sur le rendement entre au moins deux engrais.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1">df <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb18-2" title="2"><span class="st">  </span><span class="kw">kruskal_test</span>(rdt_tha <span class="op">~</span><span class="st"> </span>engrais)</a></code></pre></div>
+<div class="sourceCode" id="cb480"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb480-1" title="1">df <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb480-2" title="2"><span class="st">  </span><span class="kw">kruskal_test</span>(rdt_tha <span class="op">~</span><span class="st"> </span>engrais)</a></code></pre></div>
 <pre><code>## # A tibble: 1 x 6
 ##   .y.         n statistic    df      p method        
 ## * &lt;chr&gt;   &lt;int&gt;     &lt;dbl&gt; &lt;int&gt;  &lt;dbl&gt; &lt;chr&gt;         
 ## 1 rdt_tha    30      11.8     5 0.0382 Kruskal-Wallis</code></pre>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1">df <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb20-2" title="2"><span class="st">  </span><span class="kw">dunn_test</span>(rdt_tha <span class="op">~</span><span class="st"> </span>engrais, <span class="dt">p.adjust.method =</span> <span class="st">&quot;bonferroni&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb20-3" title="3"><span class="st">  </span><span class="kw">select</span>(group1, group2, p, p.adj, p.adj.signif) <span class="co">#%&gt;% </span></a></code></pre></div>
+<div class="sourceCode" id="cb482"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb482-1" title="1">df <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb482-2" title="2"><span class="st">  </span><span class="kw">dunn_test</span>(rdt_tha <span class="op">~</span><span class="st"> </span>engrais, <span class="dt">p.adjust.method =</span> <span class="st">&quot;bonferroni&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb482-3" title="3"><span class="st">  </span><span class="kw">select</span>(group1, group2, p, p.adj, p.adj.signif) <span class="co">#%&gt;% </span></a></code></pre></div>
 <pre><code>## # A tibble: 15 x 5
 ##    group1                   group2                         p  p.adj p.adj.signif
 ##    &lt;chr&gt;                    &lt;chr&gt;                      &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;       
@@ -593,16 +593,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 13 Engrais mineral          50% FPorcs + 50% Eng. M~ 0.236   1      ns          
 ## 14 Engrais mineral          50% FPoulets + 50% Eng.~ 0.00874 0.131  ns          
 ## 15 50% FPorcs + 50% Eng. M~ 50% FPoulets + 50% Eng.~ 0.151   1      ns</code></pre>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1">  <span class="co">#filter(p.adj.signif != &quot;ns&quot;)</span></a></code></pre></div>
+<div class="sourceCode" id="cb484"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb484-1" title="1">  <span class="co">#filter(p.adj.signif != &quot;ns&quot;)</span></a></code></pre></div>
 </div>
 <div id="comparaisons-par-paires-18" class="section level3">
 <h3><span class="header-section-number">7.3.5</span> Comparaisons par paires</h3>
 <p>Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais).</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1">tb_mc &lt;-<span class="st"> </span>(<span class="kw">SNK.test</span>(lm, <span class="st">&quot;engrais&quot;</span>, <span class="dt">group =</span> <span class="ot">TRUE</span>))<span class="op">$</span>groups <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb23-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">engrais =</span> <span class="kw">rownames</span>(.)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb23-3" title="3"><span class="st">  </span><span class="kw">select</span>(engrais, rdt_tha, groups) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb23-4" title="4"><span class="st">  </span><span class="kw">as_tibble</span>()</a>
-<a class="sourceLine" id="cb23-5" title="5">tb_mc</a></code></pre></div>
+<div class="sourceCode" id="cb485"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb485-1" title="1">tb_mc &lt;-<span class="st"> </span>(<span class="kw">SNK.test</span>(lm, <span class="st">&quot;engrais&quot;</span>, <span class="dt">group =</span> <span class="ot">TRUE</span>))<span class="op">$</span>groups <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb485-2" title="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">engrais =</span> <span class="kw">rownames</span>(.)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb485-3" title="3"><span class="st">  </span><span class="kw">select</span>(engrais, rdt_tha, groups) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb485-4" title="4"><span class="st">  </span><span class="kw">as_tibble</span>()</a>
+<a class="sourceLine" id="cb485-5" title="5">tb_mc</a></code></pre></div>
 <pre><code>## # A tibble: 6 x 3
 ##   engrais                      rdt_tha groups
 ##   &lt;chr&gt;                          &lt;dbl&gt; &lt;chr&gt; 
@@ -612,8 +612,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 4 Engrais mineral                0.742 b     
 ## 5 Fumier porcs                   0.714 b     
 ## 6 Temoin                         0.672 b</code></pre>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1">cm &lt;-<span class="st"> </span>multcomp<span class="op">::</span><span class="kw">glht</span>(lm, <span class="dt">linfct =</span> multcomp<span class="op">::</span><span class="kw">mcp</span>(<span class="dt">engrais =</span> <span class="st">&quot;Tukey&quot;</span>))</a>
-<a class="sourceLine" id="cb25-2" title="2"><span class="kw">summary</span>(cm)</a></code></pre></div>
+<div class="sourceCode" id="cb487"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb487-1" title="1">cm &lt;-<span class="st"> </span>multcomp<span class="op">::</span><span class="kw">glht</span>(lm, <span class="dt">linfct =</span> multcomp<span class="op">::</span><span class="kw">mcp</span>(<span class="dt">engrais =</span> <span class="st">&quot;Tukey&quot;</span>))</a>
+<a class="sourceLine" id="cb487-2" title="2"><span class="kw">summary</span>(cm)</a></code></pre></div>
 <pre><code>## 
 ##   Simultaneous Tests for General Linear Hypotheses
 ## 
@@ -693,14 +693,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="graphe-des-comparaisons-3" class="section level3">
 <h3><span class="header-section-number">7.3.6</span> Graphe des comparaisons</h3>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1"><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">22</span>, <span class="dv">0</span>, <span class="dv">0</span>))</a>
-<a class="sourceLine" id="cb27-2" title="2"><span class="kw">plot</span>(cm)</a></code></pre></div>
-<p><img src="Yeo_KZ_2021_Fertilisation_Tomate_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<div class="sourceCode" id="cb489"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb489-1" title="1"><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">22</span>, <span class="dv">0</span>, <span class="dv">0</span>))</a>
+<a class="sourceLine" id="cb489-2" title="2"><span class="kw">plot</span>(cm)</a></code></pre></div>
+<p><img src="Yeo_KZ_2021_Fertilisation_Tomate_files/figure-html/unnamed-chunk-332-1.png" width="672" /></p>
 </div>
 <div id="lettres-pour-différencier-18" class="section level3">
 <h3><span class="header-section-number">7.3.7</span> Lettres pour différencier</h3>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1">cld &lt;-<span class="st"> </span>multcomp<span class="op">::</span><span class="kw">cld</span>(cm)</a>
-<a class="sourceLine" id="cb28-2" title="2">cld</a></code></pre></div>
+<div class="sourceCode" id="cb490"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb490-1" title="1">cld &lt;-<span class="st"> </span>multcomp<span class="op">::</span><span class="kw">cld</span>(cm)</a>
+<a class="sourceLine" id="cb490-2" title="2">cld</a></code></pre></div>
 <pre><code>##                       Temoin                 Fumier porcs 
 ##                          &quot;a&quot;                          &quot;a&quot; 
 ##               Fumier poulets              Engrais mineral 
@@ -710,10 +710,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="les-lettres-dans-un-dataframe-pour-ggplot-18" class="section level3">
 <h3><span class="header-section-number">7.3.8</span> Les lettres dans un dataframe pour ggplot</h3>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1">Le &lt;-<span class="st"> </span>cld<span class="op">$</span>mcletters<span class="op">$</span>Letters</a>
-<a class="sourceLine" id="cb30-2" title="2">L &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">engrais =</span> <span class="kw">levels</span>(df<span class="op">$</span>engrais),</a>
-<a class="sourceLine" id="cb30-3" title="3">                <span class="dt">lettres =</span> Le)</a>
-<a class="sourceLine" id="cb30-4" title="4">L</a></code></pre></div>
+<div class="sourceCode" id="cb492"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb492-1" title="1">Le &lt;-<span class="st"> </span>cld<span class="op">$</span>mcletters<span class="op">$</span>Letters</a>
+<a class="sourceLine" id="cb492-2" title="2">L &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">engrais =</span> <span class="kw">levels</span>(df<span class="op">$</span>engrais),</a>
+<a class="sourceLine" id="cb492-3" title="3">                <span class="dt">lettres =</span> Le)</a>
+<a class="sourceLine" id="cb492-4" title="4">L</a></code></pre></div>
 <pre><code>##                                                   engrais lettres
 ## Temoin                                             Temoin       a
 ## Fumier porcs                                 Fumier porcs       a
@@ -724,13 +724,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="associer-les-moyennes-et-les-écart-types-pour-le-rapport-18" class="section level3">
 <h3><span class="header-section-number">7.3.9</span> Associer les moyennes et les écart-types pour le rapport</h3>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" title="1">rdt_moy &lt;-<span class="st"> </span>df <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb32-2" title="2"><span class="st">  </span><span class="kw">group_by</span>(engrais) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb32-3" title="3"><span class="st">  </span><span class="kw">get_summary_stats</span>(rdt_tha, <span class="dt">type =</span> <span class="st">&quot;mean_sd&quot;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb32-4" title="4"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>variable) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb32-5" title="5"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">lettres =</span> L<span class="op">$</span>lettres)</a>
-<a class="sourceLine" id="cb32-6" title="6"><span class="kw">write_csv</span>(rdt_moy, <span class="st">&quot;tab/rend_moyennes.csv&quot;</span>)</a>
-<a class="sourceLine" id="cb32-7" title="7">rdt_moy</a></code></pre></div>
+<div class="sourceCode" id="cb494"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb494-1" title="1">rdt_moy &lt;-<span class="st"> </span>df <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb494-2" title="2"><span class="st">  </span><span class="kw">group_by</span>(engrais) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb494-3" title="3"><span class="st">  </span><span class="kw">get_summary_stats</span>(rdt_tha, <span class="dt">type =</span> <span class="st">&quot;mean_sd&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb494-4" title="4"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>variable) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb494-5" title="5"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">lettres =</span> L<span class="op">$</span>lettres)</a>
+<a class="sourceLine" id="cb494-6" title="6"><span class="kw">write_csv</span>(rdt_moy, <span class="st">&quot;tab/rend_moyennes.csv&quot;</span>)</a>
+<a class="sourceLine" id="cb494-7" title="7">rdt_moy</a></code></pre></div>
 <pre><code>## # A tibble: 6 x 5
 ##   engrais                          n  mean    sd lettres
 ##   &lt;fct&gt;                        &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  
@@ -743,14 +743,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div id="graphe-avec-les-comparaisons-18" class="section level3">
 <h3><span class="header-section-number">7.3.10</span> Graphe avec les comparaisons</h3>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" title="1"><span class="kw">ggplot</span>(rdt_moy, <span class="kw">aes</span>(<span class="dt">x =</span> engrais, <span class="dt">y =</span> mean)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb34-2" title="2"><span class="st">  </span><span class="kw">geom_bar</span>(<span class="dt">stat =</span> <span class="st">&quot;identity&quot;</span>, <span class="dt">color =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">fill =</span> <span class="st">&quot;grey&quot;</span>, <span class="dt">width =</span> <span class="fl">0.6</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb34-3" title="3"><span class="st">  </span><span class="kw">ylim</span>(<span class="dv">0</span>, <span class="dv">2</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb34-4" title="4"><span class="st">  </span><span class="kw">theme_bw</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb34-5" title="5"><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;Engrais&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ylab</span>(<span class="st">&quot;Rendement t/ha&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb34-6" title="6"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">45</span>, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">vjust =</span> <span class="dv">1</span>, <span class="dt">hjust =</span> <span class="dv">1</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb34-7" title="7"><span class="st">  </span><span class="kw">geom_text</span>(<span class="kw">aes</span>(<span class="dt">label =</span> lettres), <span class="dt">vjust =</span> <span class="fl">-0.5</span>, <span class="dt">size =</span> <span class="dv">4</span>)</a></code></pre></div>
-<p><img src="Yeo_KZ_2021_Fertilisation_Tomate_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<div class="sourceCode" id="cb496"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb496-1" title="1"><span class="kw">ggplot</span>(rdt_moy, <span class="kw">aes</span>(<span class="dt">x =</span> engrais, <span class="dt">y =</span> mean)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb496-2" title="2"><span class="st">  </span><span class="kw">geom_bar</span>(<span class="dt">stat =</span> <span class="st">&quot;identity&quot;</span>, <span class="dt">color =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">fill =</span> <span class="st">&quot;grey&quot;</span>, <span class="dt">width =</span> <span class="fl">0.6</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb496-3" title="3"><span class="st">  </span><span class="kw">ylim</span>(<span class="dv">0</span>, <span class="dv">2</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb496-4" title="4"><span class="st">  </span><span class="kw">theme_bw</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb496-5" title="5"><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;Engrais&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ylab</span>(<span class="st">&quot;Rendement t/ha&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb496-6" title="6"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">45</span>, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">vjust =</span> <span class="dv">1</span>, <span class="dt">hjust =</span> <span class="dv">1</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb496-7" title="7"><span class="st">  </span><span class="kw">geom_text</span>(<span class="kw">aes</span>(<span class="dt">label =</span> lettres), <span class="dt">vjust =</span> <span class="fl">-0.5</span>, <span class="dt">size =</span> <span class="dv">4</span>)</a></code></pre></div>
+<p><img src="Yeo_KZ_2021_Fertilisation_Tomate_files/figure-html/unnamed-chunk-336-1.png" width="672" /></p>
 
 </div>
 </div>
