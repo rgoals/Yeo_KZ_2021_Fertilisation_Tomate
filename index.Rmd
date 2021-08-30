@@ -47,6 +47,7 @@ library(tidyverse) # pour la manipulation et la visualisation des données
 library(ggpubr)    # pour créer facilement des graphiques prêts à la publication
 library(rstatix)   # contient des fonctions R facilitant les analyses statistiques
 library(Rmisc)     # summarySE()
+library(agricolae) # SNK.test()
 ```
 
 

@@ -6,16 +6,17 @@ library(tidyverse)
 library(ggpubr)
 library(rstatix)
 library(Rmisc)
+library(agricolae)
 ```
 
 ## Préparation des données
 
 Jeu de données `veg.csv` qui contient différentes mesures dont le nombre de feuilles des plants de tomate, compté à 4 reprises : 
 
-1. `feuil1` : 55 j AS, 21 j AR, semaine 3 AR
-1. `feuil2` : 69 j AS, 35 j AR, semaine 5 AR 
-1. `feuil3` : 76 j AS, 42 j AR, semaine 6 AR 
-1. `feuil4` : 83 j AS, 49 j AR, semaine 7 AR.
+1. `feuil1` : 55 JAS, 21 JAR, semaine 3 AR
+1. `feuil2` : 69 JAS, 35 JAR, semaine 5 AR 
+1. `feuil3` : 76 JAS, 42 JAR, semaine 6 AR 
+1. `feuil4` : 83 JAS, 49 JAR, semaine 7 AR.
 
 La question est de savoir si les différents types d'engrais induisent des qantités de feuilles significativement différentes. 
 

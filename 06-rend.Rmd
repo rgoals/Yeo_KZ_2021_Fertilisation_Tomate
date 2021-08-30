@@ -6,6 +6,7 @@ library(tidyverse)
 library(ggpubr)
 library(rstatix)
 library(Rmisc)
+library(agricolae)
 ```
 
 ## Préparation des données
@@ -70,8 +71,8 @@ Il y a 2 observations aberrantes extrêmes mais qui ne sont pas exclues.
 ### Le modèle ANOVA
 
 ```{r}
-lm1 <- lm(rdt_tha ~ engrais, data = df)
-Anova(lm1)
+lm <- lm(rdt_tha ~ engrais, data = df)
+Anova(lm)
 ```
 
 Il y aurait une différence significative entre les effets d'au moins 2 engrais sur le rendement tomate. Mais vérifions les conditions de validité de l'ANOVA.
@@ -79,13 +80,13 @@ Il y aurait une différence significative entre les effets d'au moins 2 engrais 
 ### Indépendance des résidus
 
 ```{r}
-plot(lm1, 1)
+plot(lm, 1)
 ```
 
 ### Normalité des résidus
 
 ```{r}
-plot(lm1, 2)
+plot(lm, 2)
 ```
 
 ```{r}
@@ -95,11 +96,11 @@ shapiro_test(rdt_tha, data = df)
 ### Homogénéité des variances
 
 ```{r}
-plot(lm1, 3)
+plot(lm, 3)
 ```
 
 ```{r}
-levene_test(residuals(lm1) ~ engrais, data = df)
+levene_test(residuals(lm) ~ engrais, data = df)
 ```
 
 On retient que la conclusion de l'ANOVA peut être considérée valide : => différence d'effet sur le rendement entre au moins deux engrais. 
@@ -122,7 +123,16 @@ df %>%
 Tests post-hoc de multiples comparaisons par paires entre les groupes (ici, les engrais).
 
 ```{r}
-cm <- multcomp::glht(lm1, linfct = multcomp::mcp(engrais = "Tukey"))
+tb_mc <- (SNK.test(lm, "engrais", group = TRUE))$groups %>% 
+  mutate(engrais = rownames(.)) %>% 
+  select(engrais, rdt_tha, groups) %>% 
+  as_tibble()
+tb_mc
+```
+
+
+```{r}
+cm <- multcomp::glht(lm, linfct = multcomp::mcp(engrais = "Tukey"))
 summary(cm)
 ```
 
@@ -172,3 +182,6 @@ ggplot(rdt_moy, aes(x = engrais, y = mean)) +
   theme(axis.text.x = element_text(angle = 45, color = "black", vjust = 1, hjust = 1)) +
   geom_text(aes(label = lettres), vjust = -0.5, size = 4)
 ```
+
+
+

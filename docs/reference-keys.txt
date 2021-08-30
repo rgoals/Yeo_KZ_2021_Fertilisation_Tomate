@@ -299,3 +299,4 @@ identification-des-échantillons-aberrants-et-extrêmes-7
 identification-des-échantillons-aberrants-et-extrêmes-8
 identification-des-échantillons-aberrants-et-extrêmes-9
 identification-des-échantillons-aberrants-et-extrêmes-10
+graphe-des-comparaisons-3

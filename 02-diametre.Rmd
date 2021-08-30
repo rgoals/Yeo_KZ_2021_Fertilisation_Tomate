@@ -13,16 +13,17 @@ library(tidyverse)
 library(ggpubr)
 library(rstatix)
 library(Rmisc)
+library(agricolae)
 ```
 
 ## Préparation des données
 
 Jeu de données `veg.csv` qui contient différentes mesures dont les diamètres des plants de tomate, mesurés à 4 reprises : 
 
-1. `diam1` : 55 j AS, 21 j AR, semaine 3 AR
-1. `diam2` : 69 j AS, 35 j AR, semaine 5 AR 
-1. `diam3` : 76 j AS, 42 j AR, semaine 6 AR 
-1. `diam4` : 83 j AS, 49 j AR, semaine 7 AR.
+1. `diam1` : 55 JAS, 21 JAR, semaine 3 AR
+1. `diam2` : 69 JAS, 35 JAR, semaine 5 AR 
+1. `diam3` : 76 JAS, 42 JAR, semaine 6 AR 
+1. `diam4` : 83 JAS, 49 JAR, semaine 7 AR.
 
 La question est de savoir si les différents types d'engrais induisent des diamètres ou augmentations de diamètre de plant significativement différentes. La démarche est la même que celle du chapitre précédent.
 
